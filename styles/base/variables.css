@@ -1,0 +1,25 @@
+/**
+ * CSS Variables
+ * 
+ * Color palettes, fonts, and design tokens
+ */
+
+:root {
+    --brass: #b5a642;
+    --dark-wood: #3e2723;
+    --wood: #5d4037;
+    --cream: #f5f5dc;
+    --vintage-green: #4caf50;
+    --amber: #ffc107;
+    --red: #f44336;
+    --dark-bg: #1a1a1a;
+    
+    --modern-bg: #222;
+    --modern-text: #eee;
+    --modern-accent: #4a90e2;
+    --modern-border: #444;
+    
+    --font-main: 'Courier New', monospace;
+    --font-condensed: 'Arial Narrow', sans-serif;
+}
+

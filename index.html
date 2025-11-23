@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jacobi Iteration Equalizer</title>
+    <link rel="stylesheet" href="styles/legacy.css">
+    <!-- TODO: Switch to modular CSS when fully split: <link rel="stylesheet" href="styles/main.css"> -->
+    <!-- KaTeX for math formatting -->
+    <link rel="stylesheet" href="assets/katex/katex.min.css">
+    <script defer src="assets/katex/katex.min.js"></script>
+    <script defer src="assets/katex/contrib/auto-render.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Header Section -->
+        <header class="header">
+            <h1 class="title">Jacobi Iteration Equalizer</h1>
+            <!-- Method Selector -->
+            <div class="method-selector-header" data-tooltip="Choose iteration method: Jacobi or Gauss-Seidel">
+                <label class="method-label-header">Method:</label>
+                <div class="method-radio-group-header">
+                    <label class="method-radio-header">
+                        <input type="radio" name="method" value="jacobi" id="methodJacobi" checked>
+                        <span>Jacobi</span>
+                    </label>
+                    <label class="method-radio-header">
+                        <input type="radio" name="method" value="gaussSeidel" id="methodGaussSeidel">
+                        <span>Gauss-Seidel</span>
+                    </label>
+                </div>
+            </div>
+            <button id="themeToggle" class="theme-toggle" data-tooltip="Switch between vintage and modern designs">
+                <span class="theme-icon">🎛️</span>
+                <span class="theme-label">Modern</span>
+            </button>
+        </header>
+
+        <!-- Main Radio Panel -->
+        <main class="main-panel">
+            <!-- Left Side: Equalizer Bands Display -->
+            <div class="equation-panel">
+                <div class="equalizer-bands">
+                    <div class="band-display" id="band1" data-tooltip="Frequency Band 1: 4x₁ - x₂ + x₃ = 7. Adjusts signal level at this frequency.">
+                        <div class="band-header">
+                            <span class="band-label">Band 1</span>
+                            <span class="frequency-label">60 Hz</span>
+                            <span class="frequency-target" id="target1">Target: 7.00</span>
+                        </div>
+                        <div class="band-controls">
+                            <div class="gain-slider-container">
+                                <div class="gain-scale">
+                                    <span class="gain-mark">+12</span>
+                                    <span class="gain-mark">0</span>
+                                    <span class="gain-mark">-12</span>
+                                </div>
+                                <div class="gain-slider-track">
+                                    <div class="gain-slider-handle" id="gainHandle1"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="band-details">
+                            <span class="signal-level" id="lhs1">Output: 0.00 dB</span>
+                            <span class="deviation" id="error1">Dev: ±0.00</span>
+                        </div>
+                        <div class="vu-meter">
+                            <div class="vu-meter-scale">
+                                <div class="vu-mark">0</div>
+                                <div class="vu-mark">-3</div>
+                                <div class="vu-mark">-6</div>
+                                <div class="vu-mark">-12</div>
+                            </div>
+                            <div class="vu-meter-bar">
+                                <div class="vu-needle" id="meter1"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="band-display" id="band2" data-tooltip="Frequency Band 2: 4x₁ - 8x₂ + x₃ = -21. Adjusts signal level at this frequency.">
+                        <div class="band-header">
+                            <span class="band-label">Band 2</span>
+                            <span class="frequency-label">250 Hz</span>
+                            <span class="frequency-target" id="target2">Target: -21.00</span>
+                        </div>
+                        <div class="band-controls">
+                            <div class="gain-slider-container">
+                                <div class="gain-scale">
+                                    <span class="gain-mark">+12</span>
+                                    <span class="gain-mark">0</span>
+                                    <span class="gain-mark">-12</span>
+                                </div>
+                                <div class="gain-slider-track">
+                                    <div class="gain-slider-handle" id="gainHandle2"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="band-details">
+                            <span class="signal-level" id="lhs2">Output: 0.00 dB</span>
+                            <span class="deviation" id="error2">Dev: ±0.00</span>
+                        </div>
+                        <div class="vu-meter">
+                            <div class="vu-meter-scale">
+                                <div class="vu-mark">0</div>
+                                <div class="vu-mark">-3</div>
+                                <div class="vu-mark">-6</div>
+                                <div class="vu-mark">-12</div>
+                            </div>
+                            <div class="vu-meter-bar">
+                                <div class="vu-needle" id="meter2"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="band-display" id="band3" data-tooltip="Frequency Band 3: -2x₁ + x₂ + 5x₃ = 15. Adjusts signal level at this frequency.">
+                        <div class="band-header">
+                            <span class="band-label">Band 3</span>
+                            <span class="frequency-label">1 kHz</span>
+                            <span class="frequency-target" id="target3">Target: 15.00</span>
+                        </div>
+                        <div class="band-controls">
+                            <div class="gain-slider-container">
+                                <div class="gain-scale">
+                                    <span class="gain-mark">+12</span>
+                                    <span class="gain-mark">0</span>
+                                    <span class="gain-mark">-12</span>
+                                </div>
+                                <div class="gain-slider-track">
+                                    <div class="gain-slider-handle" id="gainHandle3"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="band-details">
+                            <span class="signal-level" id="lhs3">Output: 0.00 dB</span>
+                            <span class="deviation" id="error3">Dev: ±0.00</span>
+                        </div>
+                        <div class="vu-meter">
+                            <div class="vu-meter-scale">
+                                <div class="vu-mark">0</div>
+                                <div class="vu-mark">-3</div>
+                                <div class="vu-mark">-6</div>
+                                <div class="vu-mark">-12</div>
+                            </div>
+                            <div class="vu-meter-bar">
+                                <div class="vu-needle" id="meter3"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Signal Clarity Display -->
+                <div class="signal-clarity-display" id="signalClarityDisplay" data-tooltip="Overall signal clarity. Shows current adjustment number and maximum deviation across all bands.">
+                    <div class="adjustment-info">
+                        <span>Adjustment: <strong id="iterationCount">0</strong></span>
+                        <span>Max Deviation: <strong id="maxError">0.00</strong> dB</span>
+                        <span class="performance-info" id="performanceInfo" style="display: none;">
+                            <span id="jacobiPerf">Jacobi: -</span> | 
+                            <span id="gaussSeidelPerf">Gauss-Seidel: -</span>
+                        </span>
+                    </div>
+                    <div class="clarity-status" id="convergenceStatus">Unbalanced</div>
+                    <div class="master-level-meter">
+                        <div class="master-meter-label">Master Level</div>
+                        <div class="master-meter-bar">
+                            <div class="master-meter-fill" id="masterMeterFill"></div>
+                        </div>
+                    </div>
+                    <button id="solutionBtn" class="solution-btn" style="display: none;" data-tooltip="View solution explanation">View Solution</button>
+                    <button id="equationHistoryBtn" class="equation-history-btn" data-tooltip="View equation history">Equation History</button>
+                </div>
+            </div>
+
+            <!-- Right Side: Radio Body -->
+            <div class="radio-panel">
+                <!-- Radio Body Container -->
+                <div class="radio-body">
+                    <!-- Speaker Grille -->
+                    <div class="speaker-grille" id="speakerGrille"></div>
+                    
+                    <!-- Power Indicator -->
+                    <div class="power-indicator" id="powerIndicator"></div>
+                    
+                    <!-- Tuning Knobs Container -->
+                    <div class="knobs-container">
+                        <div class="knob-wrapper" data-tooltip="Drag vertically or horizontally to adjust x₁. Click to focus, then use arrow keys or +/- for precise control. Hold Shift for fine adjustments.">
+                            <div class="knob" id="knob1" data-variable="x1">
+                                <div class="knob-pointer"></div>
+                                <div class="knob-ridges"></div>
+                            </div>
+                            <div class="knob-label">x₁</div>
+                            <div class="knob-value" id="value1">1.00</div>
+                        </div>
+                        <div class="knob-wrapper" data-tooltip="Drag vertically or horizontally to adjust x₂. Click to focus, then use arrow keys or +/- for precise control. Hold Shift for fine adjustments.">
+                            <div class="knob" id="knob2" data-variable="x2">
+                                <div class="knob-pointer"></div>
+                                <div class="knob-ridges"></div>
+                            </div>
+                            <div class="knob-label">x₂</div>
+                            <div class="knob-value" id="value2">2.00</div>
+                        </div>
+                        <div class="knob-wrapper" data-tooltip="Drag vertically or horizontally to adjust x₃. Click to focus, then use arrow keys or +/- for precise control. Hold Shift for fine adjustments.">
+                            <div class="knob" id="knob3" data-variable="x3">
+                                <div class="knob-pointer"></div>
+                                <div class="knob-ridges"></div>
+                            </div>
+                            <div class="knob-label">x₃</div>
+                            <div class="knob-value" id="value3">2.00</div>
+                        </div>
+                    </div>
+
+                    <!-- Volume Control on Radio -->
+                    <div class="radio-volume-control" data-tooltip="Drag to adjust volume. Click to mute/unmute.">
+                        <div class="volume-slider-container">
+                            <div class="volume-slider-label">VOL</div>
+                            <div class="volume-slider-wrapper">
+                                <div class="volume-slider-track" id="volumeSliderTrack">
+                                    <div class="volume-slider-fill" id="volumeSliderFill"></div>
+                                    <div class="volume-slider-thumb" id="volumeSliderThumb"></div>
+                                </div>
+                                <div class="volume-slider-labels">
+                                    <span class="volume-label">OFF</span>
+                                    <span class="volume-label">MAX</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tuning Dial -->
+                    <div class="tuning-dial" id="tuningDial">
+                        <div class="dial-pointer"></div>
+                        <div class="dial-markings">
+                            <span class="marking">Static</span>
+                            <span class="marking">Clear</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Controls Section -->
+        <footer class="controls">
+            <button id="stepBtn" class="control-btn step-btn" data-tooltip="Perform one iteration step (Enter/Space)">Step</button>
+            <button id="autoplayBtn" class="control-btn autoplay-btn" data-tooltip="Start/stop continuous iterations (P)">▶ Play</button>
+            <div class="control-btn speed-control-btn" data-tooltip="Control autoplay speed">
+                <div class="speed-control-inner">
+                    <span class="speed-label-text">Speed:</span>
+                    <div class="speed-slider-compact-wrapper">
+                        <div class="speed-slider-track-compact" id="speedSliderTrack">
+                            <div class="speed-slider-fill-compact" id="speedSliderFill"></div>
+                            <input type="range" id="speedSlider" class="speed-slider-compact" min="1" max="100" value="50" aria-label="Autoplay speed" aria-valuemin="1" aria-valuemax="100" aria-valuenow="50">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button id="resetBtn" class="control-btn reset-btn" data-tooltip="Reset to default initial values">Reset</button>
+            <button id="randomBtn" class="control-btn random-btn" data-tooltip="Set random initial values">Random</button>
+            <button class="control-btn preset-btn" data-preset="default" data-tooltip="Default: (1, 2, 2)">Preset 1</button>
+            <button class="control-btn preset-btn" data-preset="zero" data-tooltip="Zero: (0, 0, 0)">Preset 2</button>
+            <button class="control-btn preset-btn" data-preset="negative" data-tooltip="Negative: (-1, -2, -2)">Preset 3</button>
+            <button id="codemapBtn" class="control-btn" data-tooltip="View project code map" onclick="window.location.href='codemap.html'">Code Map</button>
+            <button id="configBtn" class="control-btn config-btn" data-tooltip="Configure System">Config</button>
+            <button id="helpBtn" class="control-btn help-btn" data-tooltip="Show help and instructions">Help</button>
+        </footer>
+        
+        <!-- Help Panel -->
+        <div class="modal-overlay hidden" id="helpPanel">
+            <div class="modal-content help-modal-content">
+                <button class="modal-close" id="helpClose">×</button>
+                <h2>Jacobi Iteration Equalizer - Help</h2>
+                
+                <section class="help-section">
+                    <h3>🎛️ Equalizer Interface</h3>
+                    <p>This is a professional audio equalizer interface. You have three frequency bands (Band 1: 60 Hz, Band 2: 250 Hz, Band 3: 1 kHz) that work together to control the overall sound quality. Each band represents a frequency range that must be balanced for clear audio.</p>
+                    <p>Jacobi Iteration adjusts all bands one step at a time to find the perfect balance. When all bands are balanced, you'll hear clear nature sounds instead of static!</p>
+                </section>
+                
+                <section class="help-section">
+                    <h3>🎚️ Controls</h3>
+                    <ul>
+                        <li><strong>Frequency Band Knobs (x₁, x₂, x₃):</strong> Drag vertically or horizontally to adjust values. Click to focus, then use arrow keys or +/- for precise control. Hold Shift for fine adjustments. All knobs affect the final sound output together.</li>
+                        <li><strong>Gain Sliders:</strong> Visual representation of each band's signal level. Shows deviation from target frequency response.</li>
+                        <li><strong>VU Meters:</strong> Analog-style meters showing signal strength for each frequency band.</li>
+                        <li><strong>Step:</strong> Perform one balance adjustment to update all band levels.</li>
+                        <li><strong>Play/Pause:</strong> Automatically adjust settings until all bands are balanced.</li>
+                        <li><strong>Speed:</strong> Control how fast autoplay runs (slow to fast).</li>
+                        <li><strong>Reset:</strong> Return to default starting values (1, 2, 2).</li>
+                        <li><strong>Random:</strong> Start with random initial values.</li>
+                    </ul>
+                </section>
+                
+                <section class="help-section">
+                    <h3>📊 Frequency Bands</h3>
+                    <p>Each "Band" represents one frequency range that must be balanced:</p>
+                    <ul>
+                        <li><strong>Band 1 (60 Hz):</strong> <span class="katex-equation-inline" data-latex="4x_{1} - x_{2} + x_{3} = 7"></span></li>
+                        <li><strong>Band 2 (250 Hz):</strong> <span class="katex-equation-inline" data-latex="4x_{1} - 8x_{2} + x_{3} = -21"></span></li>
+                        <li><strong>Band 3 (1 kHz):</strong> <span class="katex-equation-inline" data-latex="-2x_{1} + x_{2} + 5x_{3} = 15"></span></li>
+                    </ul>
+                    <p>The VU meters show how close each band is to being balanced (deviation level):</p>
+                    <ul>
+                        <li><span style="color: var(--red);">🔴 Red:</span> Large deviation (|dev| ≥ 1.0) - Static noise</li>
+                        <li><span style="color: var(--amber);">🟡 Amber:</span> Medium deviation (0.1 ≤ |dev| < 1.0) - Mixed audio</li>
+                        <li><span style="color: var(--vintage-green);">🟢 Green:</span> Small deviation (|dev| < 0.1) - Clear sound</li>
+                    </ul>
+                </section>
+                
+                <section class="help-section">
+                    <h3>🔊 Audio</h3>
+                    <p>The audio provides intuitive feedback about the overall balance:</p>
+                    <ul>
+                        <li><strong>Static/Noise:</strong> When system is unbalanced (high error)</li>
+                        <li><strong>Nature Sounds:</strong> As system becomes balanced (low error)</li>
+                        <li><strong>Convergence Chime:</strong> Plays when perfect balance is reached (error < 0.0001)</li>
+                    </ul>
+                    <p>Use the volume slider to control audio. Drag to adjust volume, or click to mute/unmute. Audio is OFF by default.</p>
+                </section>
+                
+                <section class="help-section">
+                    <h3>⌨️ Keyboard Shortcuts</h3>
+                    <ul>
+                        <li><strong>Enter</strong> or <strong>Space:</strong> Perform one iteration (Step)</li>
+                        <li><strong>P:</strong> Toggle autoplay (Play/Pause)</li>
+                        <li><strong>M:</strong> Toggle mute</li>
+                        <li><strong>Knob Controls:</strong> Click a knob to focus it, then use:
+                            <ul>
+                                <li><strong>Arrow Keys</strong> or <strong>+/-</strong>: Adjust value (1.0 per press)</li>
+                                <li><strong>Shift + Arrow Keys</strong>: Fine adjustment (0.1 per press)</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </section>
+                
+                <section class="help-section">
+                    <h3>🎯 Goal</h3>
+                    <p>The perfect balance is achieved at: <span class="katex-equation-inline" data-latex="x_{1} = 2, x_{2} = 4, x_{3} = 3"></span></p>
+                    <p>Watch the VU meters and gain sliders adjust as the system balances. When all indicators show green, the master level meter is at maximum, and you hear clear nature sounds, you've successfully equalized the system!</p>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <!-- Welcome Modal -->
+    <div class="modal-overlay" id="welcomeModal">
+        <div class="modal-content">
+            <h2>Welcome to Jacobi Iteration Equalizer!</h2>
+            <p>Adjust the three frequency band knobs (x₁, x₂, x₃) to balance the audio output.</p>
+            <p>Watch the gain sliders and VU meters respond as you adjust each band.</p>
+            <p>Click 'Step' to perform one balance adjustment, or enable 'Autoplay' to watch it balance automatically.</p>
+            <p>Enable audio to hear the sound clarity improve as you find the perfect settings!</p>
+            <div class="modal-actions">
+                <label>
+                    <input type="checkbox" id="dontShowAgain"> Don't show again
+                </label>
+                <button id="closeModal" class="control-btn">Get Started</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Solution Lightbox -->
+    <div class="modal-overlay hidden" id="solutionModal">
+        <div class="modal-content solution-modal">
+            <button class="modal-close" id="closeSolutionModal">×</button>
+            <h2>🎉 System Equalized Successfully!</h2>
+            <div class="solution-content">
+                <div class="solution-section">
+                    <h3>🎯 The Perfect Balance</h3>
+                    <p class="plain-english-intro">After carefully adjusting the equalizer, you've found the perfect knob positions that make the audio crystal clear!</p>
+                    <p class="solution-values">
+                        <strong>Knob 1 (x₁): <span id="solutionX1">2.00</span></strong><br>
+                        <strong>Knob 2 (x₂): <span id="solutionX2">4.00</span></strong><br>
+                        <strong>Knob 3 (x₃): <span id="solutionX3">3.00</span></strong>
+                    </p>
+                    <p class="plain-english-explanation">These are the exact values that balance all three frequency bands simultaneously. Think of it like finding the perfect mix of bass, mid, and treble—when all three bands are set correctly, the sound is perfect!</p>
+                </div>
+                
+                <div class="solution-section">
+                    <h3>📊 How Each Frequency Band Was Balanced</h3>
+                    <p class="plain-english-intro">Let's check each frequency band to see how perfectly it's balanced:</p>
+                    
+                    <div class="equation-verification">
+                        <div class="verification-item">
+                            <div class="condition-header-plain">
+                                <strong>📡 Frequency Band 1 (60 Hz)</strong>
+                                <span class="condition-status">✓ Perfectly Balanced</span>
+                            </div>
+                            <p class="equation-plain-english">
+                                This frequency band required: <strong>4 times knob 1, minus knob 2, plus knob 3</strong> to equal exactly <strong>7</strong>.
+                            </p>
+                            <p class="equation-result-explanation">
+                                With your settings: <span class="calculation">4(<span id="verifyX1-1">2.00</span>) - <span id="verifyX2-1">4.00</span> + <span id="verifyX3-1">3.00</span></span> = <span class="result-value" id="verifyResult1">7.00</span>
+                            </p>
+                            <p class="analogy-text">
+                                <em>Like setting the bass level perfectly—the target was 7, and you hit it exactly!</em>
+                            </p>
+                        </div>
+                        
+                        <div class="verification-item">
+                            <div class="condition-header-plain">
+                                <strong>📡 Frequency Band 2 (250 Hz)</strong>
+                                <span class="condition-status">✓ Perfectly Balanced</span>
+                            </div>
+                            <p class="equation-plain-english">
+                                This frequency band required: <strong>4 times knob 1, minus 8 times knob 2, plus knob 3</strong> to equal exactly <strong>-21</strong>.
+                            </p>
+                            <p class="equation-result-explanation">
+                                With your settings: <span class="calculation">4(<span id="verifyX1-2">2.00</span>) - 8(<span id="verifyX2-2">4.00</span>) + <span id="verifyX3-2">3.00</span></span> = <span class="result-value" id="verifyResult2">-21.00</span>
+                            </p>
+                            <p class="analogy-text">
+                                <em>Like balancing the mid-tones. The target level was -21, and with your settings, the interference is completely gone.</em>
+                            </p>
+                        </div>
+                        
+                        <div class="verification-item">
+                            <div class="condition-header-plain">
+                                <strong>📡 Frequency Band 3 (1 kHz)</strong>
+                                <span class="condition-status">✓ Perfectly Balanced</span>
+                            </div>
+                            <p class="equation-plain-english">
+                                This frequency band required: <strong>negative 2 times knob 1, plus knob 2, plus 5 times knob 3</strong> to equal exactly <strong>15</strong>.
+                            </p>
+                            <p class="equation-result-explanation">
+                                With your settings: <span class="calculation">-2(<span id="verifyX1-3">2.00</span>) + <span id="verifyX2-3">4.00</span> + 5(<span id="verifyX3-3">3.00</span>)</span> = <span class="result-value" id="verifyResult3">15.00</span>
+                            </p>
+                            <p class="analogy-text">
+                                <em>Frequency Band 3 is now perfectly balanced at 15. All three bands are working together in harmony!</em>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="solution-section">
+                    <h3>🎚️ The Balancing Process</h3>
+                    <p class="plain-english-intro">Here's what happened during the balancing process:</p>
+                    <div class="convergence-details-plain">
+                        <p><strong>Number of adjustments made:</strong> <span id="solutionIterations">0</span> iterations</p>
+                        <p><strong>Final signal clarity:</strong> <span id="solutionMaxError">0.0000</span> (essentially perfect!)</p>
+                        <p><strong>Success threshold:</strong> Error less than 0.0001 (crystal clear audio)</p>
+                    </div>
+                    <p class="analogy-text">
+                        <em>Think of it like mastering a track in a studio. At first, the mix might sound muddy or harsh. But as you make small adjustments (iterations) to each track relative to the others, the sound gets clearer. Eventually, you find that sweet spot where everything sits perfectly in the mix!</em>
+                    </p>
+                </div>
+                
+                <div class="solution-section">
+                    <h3>🔬 What Just Happened (The Math Behind It)</h3>
+                    <p class="plain-english-explanation">
+                        The Jacobi Iteration method works like this: we started with an initial guess for the three knob values. Then, we repeatedly adjusted each knob based on what the other knobs were set to, using the equations as our guide. Each adjustment brought us closer to the perfect settings.
+                    </p>
+                    <p class="plain-english-explanation">
+                        It's similar to how you might adjust the levels of different instruments in a band. You tweak the drums, then checking how they sit with the bass, then adjust the guitar. You keep refining each one until the whole band sounds great together!
+                    </p>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button id="closeSolutionBtn" class="control-btn">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Equation History Modal -->
+    <div class="modal-overlay hidden" id="equationHistoryModal">
+        <div class="modal-content equation-history-modal">
+            <button class="modal-close" id="closeEquationHistoryModal">×</button>
+            <div class="modal-header">
+                <h2>Equation History</h2>
+            </div>
+            <div class="equation-visualizer-content" id="equationVisualizerContent"></div>
+            <div class="modal-actions">
+                <button id="closeEquationHistoryBtn" class="control-btn">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Startup Selection Modal -->
+    <div class="modal-overlay" id="startupModal">
+        <div class="modal-content startup-modal-content">
+            <h2>Welcome to Jacobi Iteration Equalizer</h2>
+            <p class="startup-intro">Choose how you want to start your experience:</p>
+            
+            <div class="startup-options">
+                <!-- Option 1: Default System -->
+                <div class="startup-option-card" id="optionDefault">
+                    <div class="option-icon">▶️</div>
+                    <h3>Quick Start</h3>
+                    <p>Jump right in with a pre-configured 3×3 system. Perfect for learning how the equalizer works.</p>
+                    <button class="learn-more-btn" data-target="detailsDefault">Learn More ▼</button>
+                    
+                    <div class="option-details" id="detailsDefault">
+                        <div class="detail-section">
+                            <h4>The System</h4>
+                            <div class="equation-preview" id="startupDefaultEquations">
+                                <div class="katex-equation-inline" data-latex="4x_{1} - x_{2} + x_{3} = 7"></div>
+                                <div class="katex-equation-inline" data-latex="4x_{1} - 8x_{2} + x_{3} = -21"></div>
+                                <div class="katex-equation-inline" data-latex="-2x_{1} + x_{2} + 5x_{3} = 15"></div>
+                            </div>
+                        </div>
+                        <div class="detail-section">
+                            <h4>What You'll Learn</h4>
+                            <ul>
+                                <li>How knobs affect frequency bands</li>
+                                <li>How Jacobi iteration converges</li>
+                                <li>How to interpret error displays</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <button id="btnUseDefault" class="control-btn action-btn">Use Default System</button>
+                </div>
+
+                <!-- Option 2: Custom System -->
+                <div class="startup-option-card" id="optionCustom">
+                    <div class="option-icon">⚙️</div>
+                    <h3>Custom System</h3>
+                    <p>Create your own system of equations. Choose the size, input method, and customize the display.</p>
+                    <button class="learn-more-btn" data-target="detailsCustom">Learn More ▼</button>
+                    
+                    <div class="option-details" id="detailsCustom">
+                        <div class="detail-section">
+                            <h4>Configuration Options</h4>
+                            <ul>
+                                <li>System size: 2×2 to 20×20</li>
+                                <li>Input: Text, Matrix, or Visual Editor</li>
+                                <li>Display: Visible knobs and bands</li>
+                            </ul>
+                        </div>
+                        <div class="detail-section">
+                            <h4>Best For</h4>
+                            <ul>
+                                <li>Advanced users</li>
+                                <li>Custom problems</li>
+                                <li>Exploring different systems</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <button id="btnConfigureCustom" class="control-btn action-btn">Configure Custom System</button>
+                </div>
+            </div>
+
+            <div class="startup-footer">
+                <label class="remember-choice">
+                    <input type="checkbox" id="rememberStartupChoice"> Remember my choice
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <script src="src/audio/audioSystem.js"></script>
+    <!-- State Management -->
+    <script src="stateManager.bundle.js"></script>
+    <!-- Configuration Modal -->
+    <div class="modal-overlay hidden" id="configModal">
+        <div class="modal-content config-modal-content">
+            <div class="modal-header">
+                <h2>System Configuration</h2>
+                <button class="close-btn" id="closeConfigModal">&times;</button>
+            </div>
+            
+            <div class="config-tabs">
+                <button class="tab-btn active" data-tab="matrix">Matrix Editor</button>
+                <button class="tab-btn" data-tab="text">Text Input</button>
+                <button class="tab-btn" data-tab="settings">Display Settings</button>
+                <button class="tab-btn" data-tab="visibility">Visibility</button>
+            </div>
+            
+            <div class="tab-content active" id="tab-matrix">
+                <div class="matrix-controls">
+                    <label class="control-label">System Size (n): 
+                        <input type="number" id="matrixSize" min="2" max="10" value="3" class="number-input">
+                    </label>
+                    <button id="updateMatrixSizeBtn" class="btn-small">Update Grid</button>
+                </div>
+                <div class="matrix-scroll-container">
+                    <div class="matrix-editor-container" id="matrixEditorContainer">
+                        <!-- Matrix grid will be generated here -->
+                    </div>
+                </div>
+                <div class="matrix-preview" id="matrixPreview">
+                    <h4>Equation Preview</h4>
+                    <div id="matrixPreviewContent">
+                        <!-- KaTeX rendered equations will appear here -->
+                    </div>
+                    <h4 style="margin-top: 20px;">Matrix Form</h4>
+                    <div id="matrixPreviewMatrix">
+                        <!-- KaTeX rendered matrix will appear here -->
+                    </div>
+                </div>
+                <div class="matrix-help">
+                    <p>Edit the Coefficient Matrix (A) on the left and Constant Vector (b) on the right.</p>
+                    <p class="hint">Tip: Diagonal elements (highlighted) should differ significantly from zero.</p>
+                </div>
+            </div>
+            
+            <div class="tab-content hidden" id="tab-text">
+                <p class="tab-intro">Enter your linear equations below, one per line.</p>
+                <textarea id="equationInput" class="equation-input" placeholder="4x1 - x2 + x3 = 7&#10;4x1 - 8x2 + x3 = -21&#10;-2x1 + x2 + 5x3 = 15"></textarea>
+                <div class="parser-status" id="parserStatus"></div>
+                <div class="text-preview" id="textPreview">
+                    <h4>Equation Preview</h4>
+                    <div id="textPreviewContent">
+                        <!-- KaTeX rendered equations will appear here -->
+                    </div>
+                    <h4 style="margin-top: 20px;">Matrix Form</h4>
+                    <div id="textPreviewMatrix">
+                        <!-- KaTeX rendered matrix will appear here -->
+                    </div>
+                </div>
+                <div class="example-equations">
+                    <span>Example format: <code>4x1 - x2 = 10</code> or <code>3a + 2b - c = 5</code></span>
+                </div>
+            </div>
+            
+            <div class="tab-content hidden" id="tab-settings">
+                <div class="setting-group">
+                    <h3>Display Options</h3>
+                    <div class="setting-row">
+                        <label>Visible Knobs (m):</label>
+                        <input type="number" id="settingVisibleKnobs" min="1" max="10" value="3" class="number-input">
+                        <span class="setting-desc">How many physical knobs to show on the panel.</span>
+                    </div>
+                    <div class="setting-row">
+                        <label>Visible Bands (m):</label>
+                        <input type="number" id="settingVisibleBands" min="1" max="10" value="3" class="number-input">
+                        <span class="setting-desc">How many frequency bands to show on the display.</span>
+                    </div>
+                </div>
+                
+                <div class="setting-group" style="margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(0,0,0,0.1);">
+                    <h3>Reset & Storage</h3>
+                    <div class="setting-row">
+                        <p class="setting-desc" style="margin-bottom: 15px;">Clear all stored data, preferences, and cache. This will reload the app with default settings.</p>
+                        <button id="hardResetBtn" class="btn-danger" style="width: 100%; padding: 12px; font-size: 1rem; font-weight: bold;">🗑️ Hard Reset - Clear All & Reload</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tab-content hidden" id="tab-visibility">
+                <div class="visibility-controls">
+                    <div class="visibility-section">
+                        <h3>Main Sections</h3>
+                        <div class="visibility-item">
+                            <label>
+                                <input type="checkbox" id="toggleHeader" checked>
+                                <span>Header (Title & Theme Toggle)</span>
+                            </label>
+                        </div>
+                        <div class="visibility-item">
+                            <label>
+                                <input type="checkbox" id="toggleControls" checked>
+                                <span>Control Buttons (Footer)</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="visibility-section">
+                        <h3>Left Panel (Equation Panel)</h3>
+                        <div class="visibility-item">
+                            <label>
+                                <input type="checkbox" id="toggleEqualizerBands" checked>
+                                <span>Equalizer Bands</span>
+                            </label>
+                        </div>
+                        <div class="visibility-item">
+                            <label>
+                                <input type="checkbox" id="toggleSignalClarity" checked>
+                                <span>Signal Clarity Display</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="visibility-section">
+                        <h3>Right Panel (Radio Panel)</h3>
+                        <div class="visibility-item">
+                            <label>
+                                <input type="checkbox" id="toggleRadioBody" checked>
+                                <span>Radio Body</span>
+                            </label>
+                        </div>
+                        <div class="visibility-item">
+                            <label>
+                                <input type="checkbox" id="toggleSpeakerGrille" checked>
+                                <span>Speaker Grille</span>
+                            </label>
+                        </div>
+                        <div class="visibility-item">
+                            <label>
+                                <input type="checkbox" id="togglePowerIndicator" checked>
+                                <span>Power Indicator</span>
+                            </label>
+                        </div>
+                        <div class="visibility-item">
+                            <label>
+                                <input type="checkbox" id="toggleKnobs" checked>
+                                <span>Knobs (x₁, x₂, x₃)</span>
+                            </label>
+                        </div>
+                        <div class="visibility-item">
+                            <label>
+                                <input type="checkbox" id="toggleVolumeControl" checked>
+                                <span>Volume Control</span>
+                            </label>
+                        </div>
+                        <div class="visibility-item">
+                            <label>
+                                <input type="checkbox" id="toggleTuningDial" checked>
+                                <span>Tuning Dial</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="modal-actions" style="margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(0,0,0,0.1);">
+                    <button class="btn-secondary" id="resetVisibilityBtn">Reset All</button>
+                </div>
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn-secondary" id="cancelConfigBtn">Cancel</button>
+                <button class="btn-primary" id="applyConfigBtn">Apply Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="main.js"></script>
+</body>
+</html>
+
