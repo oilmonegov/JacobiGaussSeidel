@@ -1,6 +1,6 @@
-# Jacobi Iteration Equalizer 🎛️
+# Jacobi & Gauss-Seidel Equalizer 🎛️
 
-An interactive, visual simulator that helps students understand systems of linear equations and the Jacobi iteration method through an intuitive vintage audio equalizer interface.
+An interactive, visual simulator that helps students understand systems of linear equations and iterative methods (Jacobi and Gauss-Seidel) through an intuitive vintage audio equalizer interface.
 
 ## Overview
 
@@ -21,9 +21,10 @@ The application simulates solving a system of linear equations (Ax = b) using it
 
 ### 🔄 Iteration Methods
 
-- **Jacobi Iteration**: Classic iterative method with step-by-step updates
-- **Gauss-Seidel Method**: Faster convergence using updated values immediately
-- **Performance Comparison**: Track and compare convergence rates between methods
+- **Jacobi Iteration**: Classic iterative method with step-by-step updates using previous iteration values
+- **Gauss-Seidel Method**: Faster convergence using updated values immediately as they're computed
+- **Method Switching**: Easily switch between methods using the header radio buttons
+- **Performance Comparison**: Track and compare convergence rates between methods in real-time
 
 ### 🎨 Visual Design
 
@@ -92,13 +93,15 @@ The application will open in your browser at `http://localhost:8080`
 ### Basic Operation
 
 1. **Choose a System**: On first launch, select either the default 3×3 system or configure a custom system
-2. **Adjust Knobs**: Drag knobs vertically/horizontally or use keyboard (click to focus, then arrow keys)
-3. **Perform Iterations**: 
+2. **Select Method**: Choose between Jacobi or Gauss-Seidel iteration method using the radio buttons in the header
+3. **Adjust Knobs**: Drag knobs vertically/horizontally or use keyboard (click to focus, then arrow keys)
+4. **Perform Iterations**: 
    - Click "Step" for one iteration
    - Click "Play" for automatic iterations
    - Adjust speed slider to control autoplay speed
-4. **Monitor Progress**: Watch the VU meters, gain sliders, and signal clarity display
-5. **View Solution**: When converged (error < 0.0001), click "View Solution" for detailed explanation
+5. **Monitor Progress**: Watch the VU meters, gain sliders, and signal clarity display
+6. **Compare Methods**: Switch between Jacobi and Gauss-Seidel to compare convergence rates
+7. **View Solution**: When converged (error < 0.0001), click "View Solution" for detailed explanation
 
 ### Keyboard Shortcuts
 
@@ -198,7 +201,7 @@ npm run test:coverage
 ```
 
 Test coverage includes:
-- Mathematical functions (Jacobi, error calculations, convergence)
+- Mathematical functions (Jacobi, Gauss-Seidel, error calculations, convergence)
 - State management
 - Utility functions
 - Core algorithms
