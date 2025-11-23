@@ -2,9 +2,11 @@
 
 An interactive, visual simulator that helps students understand systems of linear equations and iterative methods (Jacobi and Gauss-Seidel) through an intuitive vintage audio equalizer interface.
 
+![Jacobi & Gauss-Seidel Equalizer Interface](docs/images/interface.png)
+
 ## Overview
 
-The Jacobi Iteration Equalizer transforms abstract mathematical concepts into a tangible, visual experience. Instead of traditional equation solving, users interact with vintage-style audio knobs and meters to "tune" a system until it's perfectly balanced—just like adjusting an audio equalizer until the sound is crystal clear.
+The Jacobi & Gauss-Seidel Equalizer transforms abstract mathematical concepts into a tangible, visual experience. Instead of traditional equation solving, users interact with vintage-style audio knobs and meters to "tune" a system until it's perfectly balanced—just like adjusting an audio equalizer until the sound is crystal clear.
 
 ### Key Concept
 
@@ -118,10 +120,40 @@ Access the configuration modal via the "Config" button to:
 - Adjust display settings
 - Control component visibility
 
+## Visual Interface
+
+The application features a split-panel design with a vintage audio equalizer aesthetic:
+
+**Left Panel - Control Center:**
+- **Frequency Bands**: Three equalizer band modules (Band 1: 60 Hz, Band 2: 170 Hz, Band 3: 310 Hz) with:
+  - Vertical gain sliders showing output levels in dB
+  - Target values for each equation
+  - Deviation indicators (error from target)
+  - VU meters with analog-style needle displays
+- **Master Controls**: 
+  - Iteration counter and maximum deviation display
+  - Convergence status indicator ("Unbalanced" / "Balanced")
+  - Master level meter showing overall system state
+  - Equation History button
+
+**Right Panel - Vintage Audio Unit:**
+- **Speaker Grille**: Textured checkered pattern simulating classic audio equipment
+- **Power Indicator**: Red LED showing system activity
+- **Variable Knobs**: Three gold rotary knobs (x₁, x₂, x₃) with:
+  - Real-time value displays
+  - Smooth rotation animation
+  - Drag and keyboard control support
+- **Volume Control**: Horizontal slider with color-coded track (green to orange/red)
+- **Tuning Dial**: Large circular meter with needle indicating system balance:
+  - "Static" (left) when unbalanced
+  - "Clear" (right) when converged
+
+The interface uses a rich color palette of dark greys, browns, and gold accents, creating an authentic vintage audio equipment experience.
+
 ## Project Structure
 
 ```
-LinearEquation/
+JacobiGaussSeidel/
 ├── src/                    # Source code
 │   ├── core/              # Core business logic
 │   │   ├── jacobi.js      # Jacobi iteration algorithm
