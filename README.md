@@ -71,7 +71,7 @@ The application simulates solving a system of linear equations (Ax = b) using it
 1. Clone the repository:
 ```bash
 git clone <repository-url>
-cd LinearEquation
+cd JacobiGaussSeidel
 ```
 
 2. Install dependencies:
