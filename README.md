@@ -2,7 +2,7 @@
 
 An interactive, visual simulator that helps students understand systems of linear equations and iterative methods (Jacobi and Gauss-Seidel) through an intuitive vintage audio equalizer interface.
 
-![Jacobi & Gauss-Seidel Equalizer Interface](docs/images/interface.png)
+![Jacobi & Gauss-Seidel Equalizer Interface](assets/interface.png)
 
 ## Overview
 
