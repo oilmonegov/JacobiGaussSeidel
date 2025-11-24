@@ -2922,6 +2922,36 @@ h1, h2, h3 {
     margin-top: 10px;
     border: 1px dashed var(--brass);
     border-radius: 5px;
+    text-align: center;
+    padding: 10px;
+    color: var(--cream);
+    font-family: var(--font-condensed);
+    transition: all 0.3s ease;
+}
+
+.hk-band-label {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-bottom: 2px;
+}
+
+.hk-band-subtitle {
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+.hk-indicator-band:hover {
+    background: rgba(205, 127, 50, 0.1);
+    border-style: solid;
+}
+
+.modern-theme .hk-indicator-band {
+    border-color: var(--modern-accent);
+    color: var(--modern-text);
+}
+
+.modern-theme .hk-indicator-band:hover {
+    background: rgba(100, 150, 255, 0.1);
 }
 
 /* Configuration Modal Styles */

@@ -216,9 +216,9 @@ export function renderBands(n, visibleCount, container, A, b) {
     if (n > visibleCount) {
         const hiddenCount = n - visibleCount;
         const hkHtml = `
-            <div class="hk-indicator-band" style="text-align: center; padding: 10px; color: var(--dark-wood); font-family: var(--font-condensed);" data-tooltip="Hidden Bands: ${hiddenCount} more equations">
-                <div style="font-size: 1.2rem; font-weight: bold;">+ ${hiddenCount} Hidden Bands</div>
-                <div style="font-size: 0.8rem;">Checking internally...</div>
+            <div class="hk-indicator-band" data-tooltip="Hidden Bands: ${hiddenCount} more equations">
+                <div class="hk-band-label">+ ${hiddenCount} Hidden</div>
+                <div class="hk-band-subtitle">Bands</div>
             </div>
         `;
         container.insertAdjacentHTML('beforeend', hkHtml);
