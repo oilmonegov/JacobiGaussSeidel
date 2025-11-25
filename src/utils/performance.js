@@ -1,0 +1,236 @@
+/**
+ * Performance Measurement Module
+ * 
+ * Tracks time, memory, and CPU usage for iteration methods
+ */
+
+/**
+ * Get current memory usage in MB
+ * @returns {number|null} Memory in MB or null if API unavailable
+ */
+export function getMemoryUsage() {
+    if (performance.memory && performance.memory.usedJSHeapSize) {
+        return performance.memory.usedJSHeapSize / 1024 / 1024;
+    }
+    return null;
+}
+
+/**
+ * Start performance measurement for a method
+ * @param {string} method - 'jacobi' or 'gaussSeidel'
+ * @param {Object} state - Application state
+ */
+export function startMeasurement(method, state) {
+    if (!state.performanceHistory[method]) {
+        state.performanceHistory[method] = { runs: [], currentRun: null };
+    }
+    
+    const perf = state.performanceHistory[method];
+    
+    // Don't restart if already measuring
+    if (perf.currentRun && perf.currentRun.startTime) {
+        return;
+    }
+    
+    const startTime = performance.now();
+    const startMemory = getMemoryUsage();
+    
+    perf.currentRun = {
+        startTime,
+        startMemory,
+        lastUpdateTime: startTime,
+        lastUpdateMemory: startMemory,
+        iteration: 0
+    };
+}
+
+/**
+ * Update performance measurement during iteration
+ * @param {string} method - 'jacobi' or 'gaussSeidel'
+ * @param {number} iteration - Current iteration count
+ * @param {Object} state - Application state
+ */
+export function updateMeasurement(method, iteration, state) {
+    if (!state.performanceHistory[method]) {
+        return;
+    }
+    
+    const perf = state.performanceHistory[method];
+    const currentRun = perf.currentRun;
+    
+    if (!currentRun || !currentRun.startTime) {
+        return;
+    }
+    
+    const now = performance.now();
+    const currentMemory = getMemoryUsage();
+    const elapsedTime = (now - currentRun.startTime) / 1000; // Convert to seconds
+    const memoryUsed = currentMemory !== null && currentRun.startMemory !== null
+        ? currentMemory - currentRun.startMemory
+        : null;
+    const avgTimePerIteration = iteration > 0 ? elapsedTime / iteration * 1000 : 0; // ms per iteration
+    
+    currentRun.lastUpdateTime = now;
+    currentRun.lastUpdateMemory = currentMemory;
+    currentRun.iteration = iteration;
+    currentRun.elapsedTime = elapsedTime;
+    currentRun.memoryUsed = memoryUsed;
+    currentRun.avgTimePerIteration = avgTimePerIteration;
+}
+
+/**
+ * Complete performance measurement and store in history
+ * @param {string} method - 'jacobi' or 'gaussSeidel'
+ * @param {number} iteration - Final iteration count
+ * @param {Object} state - Application state
+ */
+export function completeMeasurement(method, iteration, state) {
+    if (!state.performanceHistory[method]) {
+        return;
+    }
+    
+    const perf = state.performanceHistory[method];
+    const currentRun = perf.currentRun;
+    
+    if (!currentRun || !currentRun.startTime) {
+        return;
+    }
+    
+    const now = performance.now();
+    const finalTime = (now - currentRun.startTime) / 1000; // Convert to seconds
+    const finalMemory = getMemoryUsage();
+    const memoryUsed = finalMemory !== null && currentRun.startMemory !== null
+        ? finalMemory - currentRun.startMemory
+        : null;
+    const avgTimePerIteration = iteration > 0 ? finalTime / iteration * 1000 : 0; // ms per iteration
+    
+    // Create completed run object
+    const completedRun = {
+        iterations: iteration,
+        timeToConverge: finalTime,
+        memoryUsed: memoryUsed,
+        avgTimePerIteration: avgTimePerIteration,
+        timestamp: new Date().toISOString()
+    };
+    
+    // Add to history
+    if (!perf.runs) {
+        perf.runs = [];
+    }
+    perf.runs.push(completedRun);
+    
+    // Clear current run
+    perf.currentRun = null;
+}
+
+/**
+ * Reset current run without affecting history
+ * @param {string} method - 'jacobi' or 'gaussSeidel'
+ * @param {Object} state - Application state
+ */
+export function resetCurrentRun(method, state) {
+    if (!state.performanceHistory[method]) {
+        return;
+    }
+    
+    const perf = state.performanceHistory[method];
+    perf.currentRun = null;
+}
+
+/**
+ * Calculate statistics from run history
+ * @param {Array} runs - Array of completed runs
+ * @returns {Object|null} Statistics object or null if no runs
+ */
+export function calculateStats(runs) {
+    if (!runs || runs.length === 0) {
+        return null;
+    }
+    
+    if (runs.length === 1) {
+        const run = runs[0];
+        return {
+            best: {
+                time: run.timeToConverge,
+                memory: run.memoryUsed,
+                iterations: run.iterations,
+                avgTimePerIter: run.avgTimePerIteration
+            },
+            worst: {
+                time: run.timeToConverge,
+                memory: run.memoryUsed,
+                iterations: run.iterations,
+                avgTimePerIter: run.avgTimePerIteration
+            },
+            average: {
+                time: run.timeToConverge,
+                memory: run.memoryUsed,
+                iterations: run.iterations,
+                avgTimePerIter: run.avgTimePerIteration
+            }
+        };
+    }
+    
+    // Calculate best (minimum) and worst (maximum)
+    let bestTime = Infinity;
+    let worstTime = -Infinity;
+    let bestMemory = Infinity;
+    let worstMemory = -Infinity;
+    let bestIterations = Infinity;
+    let worstIterations = -Infinity;
+    let bestAvgTime = Infinity;
+    let worstAvgTime = -Infinity;
+    
+    let sumTime = 0;
+    let sumMemory = 0;
+    let sumIterations = 0;
+    let sumAvgTime = 0;
+    let countMemory = 0;
+    
+    runs.forEach(run => {
+        // Time
+        if (run.timeToConverge < bestTime) bestTime = run.timeToConverge;
+        if (run.timeToConverge > worstTime) worstTime = run.timeToConverge;
+        sumTime += run.timeToConverge;
+        
+        // Memory (only if available)
+        if (run.memoryUsed !== null) {
+            if (run.memoryUsed < bestMemory) bestMemory = run.memoryUsed;
+            if (run.memoryUsed > worstMemory) worstMemory = run.memoryUsed;
+            sumMemory += run.memoryUsed;
+            countMemory++;
+        }
+        
+        // Iterations
+        if (run.iterations < bestIterations) bestIterations = run.iterations;
+        if (run.iterations > worstIterations) worstIterations = run.iterations;
+        sumIterations += run.iterations;
+        
+        // Avg time per iteration
+        if (run.avgTimePerIteration < bestAvgTime) bestAvgTime = run.avgTimePerIteration;
+        if (run.avgTimePerIteration > worstAvgTime) worstAvgTime = run.avgTimePerIteration;
+        sumAvgTime += run.avgTimePerIteration;
+    });
+    
+    return {
+        best: {
+            time: bestTime,
+            memory: countMemory > 0 ? bestMemory : null,
+            iterations: bestIterations,
+            avgTimePerIter: bestAvgTime
+        },
+        worst: {
+            time: worstTime,
+            memory: countMemory > 0 ? worstMemory : null,
+            iterations: worstIterations,
+            avgTimePerIter: worstAvgTime
+        },
+        average: {
+            time: sumTime / runs.length,
+            memory: countMemory > 0 ? sumMemory / countMemory : null,
+            iterations: sumIterations / runs.length,
+            avgTimePerIter: sumAvgTime / runs.length
+        }
+    };
+}
+
