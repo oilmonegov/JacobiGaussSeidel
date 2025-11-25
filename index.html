@@ -150,10 +150,58 @@
                     <div class="adjustment-info">
                         <span>Adjustment: <strong id="iterationCount">0</strong></span>
                         <span>Max Deviation: <strong id="maxError">0.00</strong> dB</span>
-                        <span class="performance-info" id="performanceInfo" style="display: none;">
-                            <span id="jacobiPerf">Jacobi: -</span> | 
-                            <span id="gaussSeidelPerf">Gauss-Seidel: -</span>
-                        </span>
+                    </div>
+                    <div class="performance-info" id="performanceInfo">
+                        <div class="current-metrics" id="currentMetrics">
+                            <div class="method-metrics">
+                                <div class="method-label">Jacobi</div>
+                                <div class="method-metrics-content" id="jacobiCurrent">
+                                    <div class="metric-row">
+                                        <span class="metric-label" data-tooltip="Time taken from iteration start to convergence">Time:</span>
+                                        <span class="metric-value">-</span>
+                                    </div>
+                                    <div class="metric-row">
+                                        <span class="metric-label" data-tooltip="Memory used during convergence (Chrome/Edge only)">Memory:</span>
+                                        <span class="metric-value">-</span>
+                                    </div>
+                                    <div class="metric-row">
+                                        <span class="metric-label" data-tooltip="Average time per iteration, used as CPU usage proxy">CPU:</span>
+                                        <span class="metric-value">-</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="method-metrics">
+                                <div class="method-label">Gauss-Seidel</div>
+                                <div class="method-metrics-content" id="gaussSeidelCurrent">
+                                    <div class="metric-row">
+                                        <span class="metric-label" data-tooltip="Time taken from iteration start to convergence">Time:</span>
+                                        <span class="metric-value">-</span>
+                                    </div>
+                                    <div class="metric-row">
+                                        <span class="metric-label" data-tooltip="Memory used during convergence (Chrome/Edge only)">Memory:</span>
+                                        <span class="metric-value">-</span>
+                                    </div>
+                                    <div class="metric-row">
+                                        <span class="metric-label" data-tooltip="Average time per iteration, used as CPU usage proxy">CPU:</span>
+                                        <span class="metric-value">-</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="historical-stats" id="historicalStats" style="display: none;">
+                            <div class="stats-header">Historical Statistics</div>
+                            <div class="stats-container">
+                                <div class="method-stats">
+                                    <div class="method-label">Jacobi</div>
+                                    <div class="stats-content" id="jacobiStats"></div>
+                                </div>
+                                <div class="method-stats">
+                                    <div class="method-label">Gauss-Seidel</div>
+                                    <div class="stats-content" id="gaussSeidelStats"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <button id="exportPerformanceBtn" class="export-performance-btn" data-tooltip="Export performance data to CSV">Export CSV</button>
                     </div>
                     <div class="clarity-status" id="convergenceStatus">Unbalanced</div>
                     <div class="master-level-meter">
@@ -463,6 +511,7 @@
             </div>
             <div class="equation-visualizer-content" id="equationVisualizerContent"></div>
             <div class="modal-actions">
+                <button id="exportEquationHistoryBtn" class="control-btn export-history-btn" title="Export equation history as PDF with formatted equations">Export as PDF</button>
                 <button id="closeEquationHistoryBtn" class="control-btn">Close</button>
             </div>
         </div>

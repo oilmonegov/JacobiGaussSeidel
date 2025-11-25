@@ -416,8 +416,8 @@ export function updateEquationVisualizer(equationHistory, A, b, n, method = 'jac
         return;
     }
     
-    // Iterate through history (newest first - reverse chronological)
-    for (let idx = equationHistory.length - 1; idx >= 0; idx--) {
+    // Iterate through history in ascending order (oldest first)
+    for (let idx = 0; idx < equationHistory.length; idx++) {
         const snapshot = equationHistory[idx];
         if (!snapshot || !snapshot.x) {
             continue;

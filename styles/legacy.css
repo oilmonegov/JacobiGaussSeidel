@@ -921,15 +921,13 @@ h1, h2, h3 {
 
 /* Performance Info */
 .performance-info {
-    font-size: 0.85em;
+    margin-top: 15px;
+    padding: 12px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--brass);
+    border-radius: 6px;
+    font-size: 0.85rem;
     color: var(--cream);
-    margin-left: 12px;
-    opacity: 0.8;
-    font-weight: normal;
-}
-
-.performance-info span {
-    margin: 0 4px;
 }
 
 /* Modern Theme Method Selector */
@@ -974,6 +972,220 @@ h1, h2, h3 {
 .modern-theme .performance-info {
     color: var(--modern-text);
     opacity: 0.7;
+}
+
+/* Performance Metrics Display */
+.performance-info {
+    margin-top: 15px;
+    padding: 12px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--brass);
+    border-radius: 6px;
+    font-size: 0.85rem;
+}
+
+.current-metrics {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 15px;
+}
+
+.method-metrics {
+    flex: 1;
+    padding: 8px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+}
+
+.method-label {
+    font-weight: bold;
+    color: var(--brass);
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+.method-metrics-content {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.metric-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 2px 0;
+}
+
+.metric-label {
+    color: var(--cream);
+    font-size: 0.8rem;
+}
+
+.metric-value {
+    color: var(--brass);
+    font-weight: bold;
+    font-size: 0.85rem;
+}
+
+.metric-winner {
+    color: var(--vintage-green) !important;
+    font-weight: bold;
+}
+
+.historical-stats {
+    margin-top: 15px;
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--brass);
+    border-radius: 4px;
+}
+
+.stats-header {
+    font-weight: bold;
+    color: var(--brass);
+    margin-bottom: 10px;
+    text-align: center;
+    font-size: 0.9rem;
+}
+
+.stats-container {
+    display: flex;
+    gap: 15px;
+}
+
+.method-stats {
+    flex: 1;
+    padding: 8px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+}
+
+.stats-content {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 6px;
+}
+
+.stats-section {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 4px 0;
+    border-bottom: 1px solid rgba(181, 166, 66, 0.2);
+}
+
+.stats-section:last-child {
+    border-bottom: none;
+}
+
+.stats-label {
+    font-weight: bold;
+    color: var(--cream);
+    font-size: 0.75rem;
+    margin-bottom: 2px;
+}
+
+.stats-values {
+    color: var(--brass);
+    font-size: 0.75rem;
+    word-break: break-word;
+}
+
+.stats-empty {
+    color: var(--cream);
+    opacity: 0.6;
+    font-size: 0.8rem;
+    text-align: center;
+    padding: 10px;
+}
+
+.export-performance-btn {
+    width: 100%;
+    margin-top: 10px;
+    padding: 8px 12px;
+    background: var(--brass);
+    color: var(--dark-bg);
+    border: none;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.export-performance-btn:hover {
+    background: var(--vintage-green);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(76, 175, 80, 0.4);
+}
+
+.export-performance-btn:active {
+    transform: translateY(0);
+}
+
+/* Modern theme overrides for performance metrics */
+.modern-theme .performance-info {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: var(--modern-accent);
+}
+
+.modern-theme .method-metrics,
+.modern-theme .method-stats {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.modern-theme .method-label {
+    color: var(--modern-accent);
+}
+
+.modern-theme .metric-value {
+    color: var(--modern-text);
+}
+
+.modern-theme .metric-winner {
+    color: var(--modern-success) !important;
+}
+
+.modern-theme .stats-label {
+    color: var(--modern-text);
+}
+
+.modern-theme .stats-values {
+    color: var(--modern-text);
+    opacity: 0.9;
+}
+
+.modern-theme .export-performance-btn {
+    background: var(--modern-accent);
+    color: var(--modern-bg);
+}
+
+.modern-theme .export-performance-btn:hover {
+    background: var(--modern-success);
+}
+
+/* Responsive design for performance metrics */
+@media (max-width: 768px) {
+    .current-metrics {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .stats-container {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .performance-info {
+        font-size: 0.75rem;
+    }
+    
+    .metric-value {
+        font-size: 0.75rem;
+    }
 }
 
 .adjustment-info {
@@ -1404,6 +1616,31 @@ h1, h2, h3 {
     box-shadow: 
         0 2px 8px rgba(181, 166, 66, 0.4),
         inset 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.control-btn:disabled,
+.control-btn.loading {
+    opacity: 0.6;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.export-history-btn {
+    margin-right: 10px;
+}
+
+.modern-theme .export-history-btn {
+    border-color: var(--modern-accent);
+    color: var(--modern-accent);
+    background: 
+        linear-gradient(135deg, rgba(74, 144, 226, 0.1) 0%, transparent 100%);
+}
+
+.modern-theme .export-history-btn:hover {
+    background: 
+        linear-gradient(135deg, var(--modern-accent) 0%, rgba(74, 144, 226, 0.9) 100%);
+    color: #fff;
+    border-color: var(--modern-accent);
 }
 
 /* Phase 5: Responsive Design */

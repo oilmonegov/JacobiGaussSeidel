@@ -19,6 +19,9 @@ import { computeNextGaussSeidel } from './src/core/gaussSeidel.js';
 import { getDefaultSystem } from './src/core/system.js';
 import { renderLaTeXWithKaTeX } from './src/utils/formatting.js';
 import { initEquationVisualizer, updateEquationVisualizer, addIterationSnapshot, clearEquationHistory } from './src/ui/equationVisualizer.js';
+import { startMeasurement, updateMeasurement, completeMeasurement, resetCurrentRun } from './src/utils/performance.js';
+import { updatePerformanceDisplay } from './src/ui/performanceDisplay.js';
+import { exportPerformanceToCSV, downloadCSV, generateFilename, exportEquationHistoryToPDF } from './src/utils/export.js';
 
 // State management
 const state = {
@@ -63,8 +66,8 @@ const state = {
     equationHistory: [], // History of iteration snapshots for equation visualizer
     method: 'jacobi', // 'jacobi' or 'gaussSeidel'
     performanceHistory: {
-        jacobi: { iterationsToConverge: null, lastConvergenceIteration: null },
-        gaussSeidel: { iterationsToConverge: null, lastConvergenceIteration: null }
+        jacobi: { runs: [], currentRun: null },
+        gaussSeidel: { runs: [], currentRun: null }
     },
     // Visibility state for all components
     visibility: {
@@ -104,6 +107,7 @@ const elements = {
     equationHistoryModal: document.getElementById('equationHistoryModal'),
     closeEquationHistoryModal: document.getElementById('closeEquationHistoryModal'),
     closeEquationHistoryBtn: document.getElementById('closeEquationHistoryBtn'),
+    exportEquationHistoryBtn: document.getElementById('exportEquationHistoryBtn'),
     solutionBtn: document.getElementById('solutionBtn'),
     solutionModal: document.getElementById('solutionModal'),
     closeSolutionModal: document.getElementById('closeSolutionModal'),
@@ -215,7 +219,10 @@ function initializeDefaultSystem() {
 }
 
 function initializeCustomSystem() {
-    if (elements.startupModal) elements.startupModal.classList.add('hidden');
+    // Hide startup modal first
+    if (elements.startupModal) {
+        elements.startupModal.classList.add('hidden');
+    }
     
     // Try to load saved config
     let savedConfig = null;
@@ -246,11 +253,23 @@ function initializeCustomSystem() {
             showMessage('Loaded custom configuration.', 'success');
         } catch (e) {
             console.error("Error loading config", e);
-            showConfigModal();
+            // Use requestAnimationFrame to ensure DOM has updated before showing config modal
+            // This prevents the click event from propagating to the config modal overlay
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    showConfigModal();
+                });
+            });
         }
     } else {
         // Open Config Modal if no saved config
-        showConfigModal();
+        // Use requestAnimationFrame to ensure DOM has updated before showing config modal
+        // This prevents the click event from propagating to the config modal overlay
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                showConfigModal();
+            });
+        });
     }
 }
 
@@ -271,14 +290,18 @@ function setupStartupListeners() {
     
     // Option: Configure Custom
     if (elements.btnConfigureCustom) {
-        elements.btnConfigureCustom.addEventListener('click', () => {
+        elements.btnConfigureCustom.addEventListener('click', (e) => {
+            e.preventDefault(); // Prevent any default behavior
+            e.stopPropagation(); // Prevent event from bubbling to modal overlay
             if (elements.rememberStartupChoice && elements.rememberStartupChoice.checked) {
                 try {
                     localStorage.setItem('jacobiRadioStartupChoice', 'custom');
-                } catch (e) {
-                    console.warn('Could not save startup choice to localStorage:', e);
+                } catch (err) {
+                    console.warn('Could not save startup choice to localStorage:', err);
                 }
             }
+            // Use setTimeout to ensure the startup modal closes before opening config modal
+            // This prevents the click event from propagating to the config modal overlay
             initializeCustomSystem();
         });
     }
@@ -426,22 +449,7 @@ function updateDisplays() {
     elements.convergenceStatus.style.color = convergence.color;
     
     // Update performance display
-    const perfInfo = document.getElementById('performanceInfo');
-    const jacobiPerfEl = document.getElementById('jacobiPerf');
-    const gsPerfEl = document.getElementById('gaussSeidelPerf');
-    
-    if (perfInfo && jacobiPerfEl && gsPerfEl) {
-        const jacobiPerf = state.performanceHistory.jacobi;
-        const gsPerf = state.performanceHistory.gaussSeidel;
-        
-        jacobiPerfEl.textContent = `Jacobi: ${jacobiPerf.iterationsToConverge !== null ? jacobiPerf.iterationsToConverge + ' iters' : '-'}`;
-        gsPerfEl.textContent = `Gauss-Seidel: ${gsPerf.iterationsToConverge !== null ? gsPerf.iterationsToConverge + ' iters' : '-'}`;
-        
-        // Show if at least one method has converged
-        if (jacobiPerf.iterationsToConverge !== null || gsPerf.iterationsToConverge !== null) {
-            perfInfo.style.display = 'block';
-        }
-    }
+    updatePerformanceDisplay(elements, state);
     
     // Update master level meter
     if (elements.masterMeterFill) {
@@ -852,6 +860,9 @@ function setupKnobListeners() {
 function performIteration() {
     let newX;
     
+    // Start measurement if not already started
+    startMeasurement(state.method, state);
+    
     // Choose method based on state
     if (state.method === 'gaussSeidel') {
         // Gauss-Seidel modifies in-place, so we need to copy first
@@ -878,6 +889,9 @@ function performIteration() {
     
     state.iteration++;
     
+    // Update performance measurement
+    updateMeasurement(state.method, state.iteration, state);
+    
     // Capture iteration snapshot for equation visualizer
     addIterationSnapshot(state.equationHistory, state.iteration, [...state.x], state.A);
     
@@ -897,22 +911,23 @@ function performIteration() {
     const maxError = getMaxError(errors);
     
     if (maxError < 0.0001) {
-        // Track performance
-        const perf = state.performanceHistory[state.method];
-        if (perf.iterationsToConverge === null) {
-            perf.iterationsToConverge = state.iteration;
-            perf.lastConvergenceIteration = state.iteration;
+        // Complete performance measurement
+        completeMeasurement(state.method, state.iteration, state);
+        
+        // Show performance comparison if both methods have converged
+        const jacobiRuns = state.performanceHistory.jacobi.runs || [];
+        const gaussSeidelRuns = state.performanceHistory.gaussSeidel.runs || [];
+        
+        if (jacobiRuns.length > 0 && gaussSeidelRuns.length > 0) {
+            const jacobiLast = jacobiRuns[jacobiRuns.length - 1];
+            const gaussSeidelLast = gaussSeidelRuns[gaussSeidelRuns.length - 1];
             
-            // Show performance comparison if both methods have converged
-            const jacobiPerf = state.performanceHistory.jacobi;
-            const gsPerf = state.performanceHistory.gaussSeidel;
-            
-            if (jacobiPerf.iterationsToConverge && gsPerf.iterationsToConverge) {
-                const faster = jacobiPerf.iterationsToConverge < gsPerf.iterationsToConverge ? 'Jacobi' : 'Gauss-Seidel';
-                const ratio = Math.max(jacobiPerf.iterationsToConverge, gsPerf.iterationsToConverge) / 
-                             Math.min(jacobiPerf.iterationsToConverge, gsPerf.iterationsToConverge);
+            if (jacobiLast && gaussSeidelLast) {
+                const faster = jacobiLast.iterations < gaussSeidelLast.iterations ? 'Jacobi' : 'Gauss-Seidel';
+                const ratio = Math.max(jacobiLast.iterations, gaussSeidelLast.iterations) / 
+                             Math.min(jacobiLast.iterations, gaussSeidelLast.iterations);
                 showMessage(
-                    `Performance: Jacobi (${jacobiPerf.iterationsToConverge} iters) vs Gauss-Seidel (${gsPerf.iterationsToConverge} iters). ${faster} is ${ratio.toFixed(2)}x faster!`,
+                    `Performance: Jacobi (${jacobiLast.iterations} iters) vs Gauss-Seidel (${gaussSeidelLast.iterations} iters). ${faster} is ${ratio.toFixed(2)}x faster!`,
                     'success'
                 );
             }
@@ -927,6 +942,8 @@ function performIteration() {
     
     // Check for non-convergence
     if (state.iteration > 1000) {
+        // Reset current run on non-convergence
+        resetCurrentRun(state.method, state);
         stopAutoplay();
         showMessage('Not converging after 1000 iterations. Try a different starting point.', 'error');
     }
@@ -1044,6 +1061,10 @@ function updateSpeed(speed) {
 // Reset to default values
 function reset() {
     stopAutoplay();
+    // Reset performance measurements (clear current runs, keep history)
+    resetCurrentRun('jacobi', state);
+    resetCurrentRun('gaussSeidel', state);
+    
     // Reset to initial guess stored in state
     // If initialGuess is not set or doesn't match system size, use default values
     if (!state.initialGuess || state.initialGuess.length !== state.n) {
@@ -1646,7 +1667,17 @@ function setupEventListeners() {
     methodRadios.forEach(radio => {
         radio.addEventListener('change', (e) => {
             const oldMethod = state.method;
-            state.method = e.target.value;
+            const newMethod = e.target.value;
+            
+            // Complete current run for previous method if in progress
+            if (state.performanceHistory[oldMethod] && state.performanceHistory[oldMethod].currentRun) {
+                completeMeasurement(oldMethod, state.iteration, state);
+            }
+            
+            // Reset current run for previous method
+            resetCurrentRun(oldMethod, state);
+            
+            state.method = newMethod;
             
             // Reset iteration counter when switching methods
             state.iteration = 0;
@@ -1666,6 +1697,22 @@ function setupEventListeners() {
             }
         });
     });
+    
+    // Export performance button
+    const exportPerformanceBtn = document.getElementById('exportPerformanceBtn');
+    if (exportPerformanceBtn) {
+        exportPerformanceBtn.addEventListener('click', () => {
+            try {
+                const csvContent = exportPerformanceToCSV(state.performanceHistory);
+                const filename = generateFilename();
+                downloadCSV(csvContent, filename);
+                showMessage('Performance data exported successfully!', 'success');
+            } catch (e) {
+                console.error('Export error:', e);
+                showMessage('Error exporting performance data', 'error');
+            }
+        });
+    }
     
     // Solution button
     if (elements.solutionBtn) {
@@ -1688,6 +1735,38 @@ function setupEventListeners() {
         elements.equationHistoryModal.addEventListener('click', (e) => {
             if (e.target === elements.equationHistoryModal) {
                 hideEquationHistoryModal();
+            }
+        });
+    }
+    
+    // Export equation history button
+    if (elements.exportEquationHistoryBtn) {
+        elements.exportEquationHistoryBtn.addEventListener('click', async () => {
+            const btn = elements.exportEquationHistoryBtn;
+            const originalText = btn.textContent;
+            
+            // Disable button and show loading state
+            btn.disabled = true;
+            btn.textContent = 'Generating PDF...';
+            btn.classList.add('loading');
+            
+            try {
+                await exportEquationHistoryToPDF(
+                    state.equationHistory,
+                    state.A,
+                    state.b,
+                    state.n,
+                    state.method
+                );
+                showMessage('Equation history exported successfully!', 'success');
+            } catch (error) {
+                console.error('Export error:', error);
+                showMessage(error.message || 'Error exporting equation history', 'error');
+            } finally {
+                // Re-enable button
+                btn.disabled = false;
+                btn.textContent = originalText;
+                btn.classList.remove('loading');
             }
         });
     }
@@ -1924,6 +2003,16 @@ function initConfigModal() {
     const btnApply = document.getElementById('applyConfigBtn');
     const btnUpdateSize = document.getElementById('updateMatrixSizeBtn');
     const inputSize = document.getElementById('matrixSize');
+    
+    // Prevent closing when clicking inside the modal content
+    if (modal) {
+        modal.addEventListener('click', (e) => {
+            // Only close if clicking directly on the overlay (not on modal content)
+            if (e.target === modal) {
+                modal.classList.add('hidden');
+            }
+        });
+    }
     
     // Tab switching
     document.querySelectorAll('.tab-btn').forEach(btn => {

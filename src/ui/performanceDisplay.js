@@ -116,15 +116,15 @@ export function updatePerformanceDisplay(elements, state) {
         const cpuStr = formatCPU(jacobiCurrentMetrics.avgTimePerIter);
         jacobiCurrentEl.innerHTML = `
             <div class="metric-row">
-                <span class="metric-label">Time:</span>
+                <span class="metric-label" data-tooltip="Time taken from iteration start to convergence">Time:</span>
                 <span class="metric-value ${getWinner(jacobiCurrentMetrics, gaussSeidelCurrentMetrics, 'time') === 'method1' ? 'metric-winner' : ''}">${timeStr}</span>
             </div>
             <div class="metric-row">
-                <span class="metric-label">Memory:</span>
+                <span class="metric-label" data-tooltip="Memory used during convergence (Chrome/Edge only)">Memory:</span>
                 <span class="metric-value ${getWinner(jacobiCurrentMetrics, gaussSeidelCurrentMetrics, 'memory') === 'method1' ? 'metric-winner' : ''}">${memoryStr}</span>
             </div>
             <div class="metric-row">
-                <span class="metric-label">CPU:</span>
+                <span class="metric-label" data-tooltip="Average time per iteration, used as CPU usage proxy">CPU:</span>
                 <span class="metric-value ${getWinner(jacobiCurrentMetrics, gaussSeidelCurrentMetrics, 'cpu') === 'method1' ? 'metric-winner' : ''}">${cpuStr}</span>
             </div>
         `;
@@ -136,15 +136,15 @@ export function updatePerformanceDisplay(elements, state) {
         const cpuStr = formatCPU(gaussSeidelCurrentMetrics.avgTimePerIter);
         gaussSeidelCurrentEl.innerHTML = `
             <div class="metric-row">
-                <span class="metric-label">Time:</span>
+                <span class="metric-label" data-tooltip="Time taken from iteration start to convergence">Time:</span>
                 <span class="metric-value ${getWinner(jacobiCurrentMetrics, gaussSeidelCurrentMetrics, 'time') === 'method2' ? 'metric-winner' : ''}">${timeStr}</span>
             </div>
             <div class="metric-row">
-                <span class="metric-label">Memory:</span>
+                <span class="metric-label" data-tooltip="Memory used during convergence (Chrome/Edge only)">Memory:</span>
                 <span class="metric-value ${getWinner(jacobiCurrentMetrics, gaussSeidelCurrentMetrics, 'memory') === 'method2' ? 'metric-winner' : ''}">${memoryStr}</span>
             </div>
             <div class="metric-row">
-                <span class="metric-label">CPU:</span>
+                <span class="metric-label" data-tooltip="Average time per iteration, used as CPU usage proxy">CPU:</span>
                 <span class="metric-value ${getWinner(jacobiCurrentMetrics, gaussSeidelCurrentMetrics, 'cpu') === 'method2' ? 'metric-winner' : ''}">${cpuStr}</span>
             </div>
         `;

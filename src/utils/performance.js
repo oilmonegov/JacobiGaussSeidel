@@ -45,6 +45,20 @@ export function startMeasurement(method, state) {
 }
 
 /**
+ * Validate and sanitize a numeric value
+ * @param {number} value - Value to validate
+ * @param {number} defaultValue - Default value if invalid
+ * @returns {number} Validated value
+ */
+function validateNumber(value, defaultValue = 0) {
+    if (value === null || value === undefined || !isFinite(value) || isNaN(value)) {
+        return defaultValue;
+    }
+    // Ensure non-negative for time and iterations
+    return Math.max(0, value);
+}
+
+/**
  * Update performance measurement during iteration
  * @param {string} method - 'jacobi' or 'gaussSeidel'
  * @param {number} iteration - Current iteration count
@@ -70,12 +84,18 @@ export function updateMeasurement(method, iteration, state) {
         : null;
     const avgTimePerIteration = iteration > 0 ? elapsedTime / iteration * 1000 : 0; // ms per iteration
     
+    // Validate all values
+    const validatedIteration = validateNumber(iteration, 0);
+    const validatedElapsedTime = validateNumber(elapsedTime, 0);
+    const validatedMemoryUsed = memoryUsed !== null ? validateNumber(memoryUsed, null) : null;
+    const validatedAvgTime = validateNumber(avgTimePerIteration, 0);
+    
     currentRun.lastUpdateTime = now;
     currentRun.lastUpdateMemory = currentMemory;
-    currentRun.iteration = iteration;
-    currentRun.elapsedTime = elapsedTime;
-    currentRun.memoryUsed = memoryUsed;
-    currentRun.avgTimePerIteration = avgTimePerIteration;
+    currentRun.iteration = validatedIteration;
+    currentRun.elapsedTime = validatedElapsedTime;
+    currentRun.memoryUsed = validatedMemoryUsed;
+    currentRun.avgTimePerIteration = validatedAvgTime;
 }
 
 /**
@@ -104,12 +124,18 @@ export function completeMeasurement(method, iteration, state) {
         : null;
     const avgTimePerIteration = iteration > 0 ? finalTime / iteration * 1000 : 0; // ms per iteration
     
-    // Create completed run object
+    // Validate all values before storing
+    const validatedIteration = validateNumber(iteration, 0);
+    const validatedFinalTime = validateNumber(finalTime, 0);
+    const validatedMemoryUsed = memoryUsed !== null ? validateNumber(memoryUsed, null) : null;
+    const validatedAvgTime = validateNumber(avgTimePerIteration, 0);
+    
+    // Create completed run object with validated values
     const completedRun = {
-        iterations: iteration,
-        timeToConverge: finalTime,
-        memoryUsed: memoryUsed,
-        avgTimePerIteration: avgTimePerIteration,
+        iterations: validatedIteration,
+        timeToConverge: validatedFinalTime,
+        memoryUsed: validatedMemoryUsed,
+        avgTimePerIteration: validatedAvgTime,
         timestamp: new Date().toISOString()
     };
     
