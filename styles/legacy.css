@@ -3606,3 +3606,82 @@ h1, h2, h3 {
 .visibility-item span {
     flex: 1;
 }
+
+/* Print styles for solution modal */
+@media print {
+    body * {
+        visibility: hidden;
+    }
+    
+    #solutionModal,
+    #solutionModal * {
+        visibility: visible;
+    }
+    
+    #solutionModal {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: auto;
+        background: white;
+        padding: 0;
+        margin: 0;
+        box-shadow: none;
+        border: none;
+        z-index: 9999;
+    }
+    
+    #solutionModal .modal-overlay {
+        position: static;
+        background: white;
+        display: block;
+    }
+    
+    #solutionModal .modal-content {
+        position: static;
+        max-width: 100%;
+        width: 100%;
+        max-height: none;
+        height: auto;
+        overflow: visible;
+        padding: 20px;
+        margin: 0;
+        box-shadow: none;
+        border: none;
+        background: white;
+        color: black;
+    }
+    
+    #solutionModal .modal-close,
+    #solutionModal .modal-actions,
+    #solutionModal .modal-actions * {
+        display: none !important;
+    }
+    
+    #solutionModal h2,
+    #solutionModal h3 {
+        color: black !important;
+        page-break-after: avoid;
+    }
+    
+    #solutionModal .solution-section {
+        page-break-inside: avoid;
+        margin-bottom: 20px;
+    }
+    
+    #solutionModal .solution-content {
+        max-height: none;
+        overflow: visible;
+    }
+    
+    #solutionModal .verification-item {
+        page-break-inside: avoid;
+        margin-bottom: 15px;
+    }
+    
+    #solutionModal .katex,
+    #solutionModal .katex-display {
+        color: black !important;
+    }
+}

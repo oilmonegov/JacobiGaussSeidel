@@ -21,7 +21,7 @@ import { renderLaTeXWithKaTeX } from './src/utils/formatting.js';
 import { initEquationVisualizer, updateEquationVisualizer, addIterationSnapshot, clearEquationHistory } from './src/ui/equationVisualizer.js';
 import { startMeasurement, updateMeasurement, completeMeasurement, resetCurrentRun } from './src/utils/performance.js';
 import { updatePerformanceDisplay } from './src/ui/performanceDisplay.js';
-import { exportPerformanceToCSV, downloadCSV, generateFilename, exportEquationHistoryToPDF } from './src/utils/export.js';
+import { exportPerformanceToCSV, downloadCSV, generateFilename } from './src/utils/export.js';
 
 // State management
 const state = {
@@ -107,10 +107,10 @@ const elements = {
     equationHistoryModal: document.getElementById('equationHistoryModal'),
     closeEquationHistoryModal: document.getElementById('closeEquationHistoryModal'),
     closeEquationHistoryBtn: document.getElementById('closeEquationHistoryBtn'),
-    exportEquationHistoryBtn: document.getElementById('exportEquationHistoryBtn'),
     solutionBtn: document.getElementById('solutionBtn'),
     solutionModal: document.getElementById('solutionModal'),
     closeSolutionModal: document.getElementById('closeSolutionModal'),
+    printSolutionBtn: document.getElementById('printSolutionBtn'),
     closeSolutionBtn: document.getElementById('closeSolutionBtn'),
     powerIndicator: document.getElementById('powerIndicator'),
     speakerGrille: document.getElementById('speakerGrille'),
@@ -1739,44 +1739,20 @@ function setupEventListeners() {
         });
     }
     
-    // Export equation history button
-    if (elements.exportEquationHistoryBtn) {
-        elements.exportEquationHistoryBtn.addEventListener('click', async () => {
-            const btn = elements.exportEquationHistoryBtn;
-            const originalText = btn.textContent;
-            
-            // Disable button and show loading state
-            btn.disabled = true;
-            btn.textContent = 'Generating PDF...';
-            btn.classList.add('loading');
-            
-            try {
-                await exportEquationHistoryToPDF(
-                    state.equationHistory,
-                    state.A,
-                    state.b,
-                    state.n,
-                    state.method
-                );
-                showMessage('Equation history exported successfully!', 'success');
-            } catch (error) {
-                console.error('Export error:', error);
-                showMessage(error.message || 'Error exporting equation history', 'error');
-            } finally {
-                // Re-enable button
-                btn.disabled = false;
-                btn.textContent = originalText;
-                btn.classList.remove('loading');
-            }
-        });
-    }
-    
     // Solution modal close buttons
     if (elements.closeSolutionModal) {
         elements.closeSolutionModal.addEventListener('click', hideSolutionModal);
     }
     if (elements.closeSolutionBtn) {
         elements.closeSolutionBtn.addEventListener('click', hideSolutionModal);
+    }
+    if (elements.printSolutionBtn) {
+        elements.printSolutionBtn.addEventListener('click', () => {
+            window.print();
+            if (window.audioSystem) {
+                window.audioSystem.playButtonClick();
+            }
+        });
     }
     if (elements.solutionModal) {
         elements.solutionModal.addEventListener('click', (e) => {

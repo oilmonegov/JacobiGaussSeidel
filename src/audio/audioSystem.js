@@ -23,8 +23,44 @@ class AudioSystem {
         this.volume = 0.5; // 0-1 range
         this.natureBuffer = null;
         this.natureLoop = null;
+        this.distortionNode = null; // WaveShaperNode for distortion effect
         this.initialized = false;
         this.isLoading = false;
+        
+        // Free nature sound from open source platform
+        // 
+        // To add your own free nature sound:
+        // 1. Download a free nature sound (forest, birds, water, etc.) from:
+        //    - Mixkit: https://mixkit.co/free-sound-effects/nature/
+        //    - Freesound: https://freesound.org (requires free account)
+        //    - 99Sounds: https://99sounds.org/nature-sounds/
+        // 2. Save it in the assets/ folder with one of these names:
+        //    - nature-sound.mp3
+        //    - nature-sound.ogg
+        //    - nature-sound.wav
+        //    - nature.mp3 (or .ogg, .wav)
+        // 3. The audio system will automatically detect and use it
+        // 
+        // The nature sound will start heavily distorted (like static) and gradually
+        // gain clarity as the equation converges (error decreases).
+        
+        // Try multiple possible file names and formats
+        // Includes the audio file found in assets/audio/ directory
+        this.natureSoundPaths = [
+            'assets/audio/Computer-Math-That-Breaks-Everything.m4a', // Found in assets directory
+            'assets/nature-sound.mp3',
+            'assets/nature-sound.ogg',
+            'assets/nature-sound.wav',
+            'assets/nature-sound.m4a',
+            'assets/nature.mp3',
+            'assets/nature.ogg',
+            'assets/nature.wav',
+            'assets/nature.m4a',
+            'assets/audio/nature-sound.mp3',
+            'assets/audio/nature-sound.ogg',
+            'assets/audio/nature-sound.wav',
+            'assets/audio/nature-sound.m4a'
+        ];
         
         this.init();
     }
@@ -48,9 +84,15 @@ class AudioSystem {
             this.natureGain = this.audioContext.createGain();
             this.masterGain = this.audioContext.createGain();
             
-            // Connect nodes
-            this.noiseGain.connect(this.masterGain);
+            // Create distortion node (WaveShaperNode) for nature sound
+            this.distortionNode = this.audioContext.createWaveShaper();
+            this.distortionNode.curve = this.makeDistortionCurve(0); // Start with no distortion
+            this.distortionNode.oversample = '4x'; // Higher quality
+            
+            // Connect nodes: nature sound -> distortion -> nature gain -> master gain
             this.natureGain.connect(this.masterGain);
+            this.distortionNode.connect(this.natureGain);
+            this.noiseGain.connect(this.masterGain);
             this.masterGain.connect(this.audioContext.destination);
             
             // Set initial volumes
@@ -127,28 +169,154 @@ class AudioSystem {
     }
     
     /**
-     * Load nature sounds for low-error states
-     * Currently generates synthetic nature sounds using Web Audio API
-     * In production, could load actual audio files from assets/
+     * Create distortion curve for WaveShaperNode
+     * Creates a static/distorted effect that simulates radio interference
+     * Enhanced for heavier distortion at high amounts (>80%)
+     * @param {number} amount - Distortion amount (0-100, where 0 = no distortion, 100 = maximum static)
+     * @returns {Float32Array} Distortion curve
      */
-    async loadNatureSounds() {
-        // For now, we'll generate synthetic nature sounds
-        // In production, you would load actual audio files here
-        try {
-            // Create a pleasant nature-like sound using oscillators
-            // This is a simplified version - in production, use actual audio files
-            this.createSyntheticNatureSound();
-        } catch (error) {
-            console.warn('Could not load nature sounds:', error);
-            this.hideLoadingIndicator();
+    makeDistortionCurve(amount) {
+        const samples = 44100;
+        const curve = new Float32Array(samples);
+        
+        // Convert amount (0-100) to a distortion factor
+        // Higher amount = more distortion (static/crackling effect)
+        const distortionFactor = amount / 100;
+        const isHeavyDistortion = distortionFactor > 0.8; // >80% distortion
+        
+        // Use a seeded random for consistent static pattern (but still random-like)
+        let seed = Math.floor(distortionFactor * 1000);
+        const random = () => {
+            seed = (seed * 9301 + 49297) % 233280;
+            return seed / 233280;
+        };
+        
+        for (let i = 0; i < samples; i++) {
+            const x = (i * 2) / samples - 1;
+            let y = x;
+            
+            if (distortionFactor > 0) {
+                // Enhanced clipping distortion - more aggressive at high distortion
+                let clipAmount;
+                if (isHeavyDistortion) {
+                    // Very aggressive clipping for heavy distortion (>80%)
+                    clipAmount = 0.9 + (distortionFactor - 0.8) * 0.5; // 0.9 to 1.4
+                } else {
+                    clipAmount = distortionFactor * 0.9;
+                }
+                y = Math.max(-1, Math.min(1, y * (1 + clipAmount * 2.5)));
+                
+                // Enhanced bitcrushing - more severe at high distortion
+                let bitDepth;
+                if (isHeavyDistortion) {
+                    // Very low bit depth for heavy distortion (2-4 bits)
+                    bitDepth = Math.max(2, 4 - (distortionFactor - 0.8) * 10);
+                } else {
+                    bitDepth = Math.max(2, 16 - (distortionFactor * 12));
+                }
+                const step = Math.pow(2, bitDepth);
+                y = Math.round(y * step) / step;
+                
+                // Enhanced waveshaping - more aggressive at high distortion
+                let waveshapeAmount;
+                if (isHeavyDistortion) {
+                    waveshapeAmount = 0.5 + (distortionFactor - 0.8) * 0.5; // 0.5 to 0.6
+                } else {
+                    waveshapeAmount = distortionFactor * 0.5;
+                }
+                y = Math.max(-1, Math.min(1, y + Math.sin(y * Math.PI * 6) * waveshapeAmount));
+                
+                // Enhanced noise/static - much more at high distortion
+                let noiseAmount;
+                if (isHeavyDistortion) {
+                    // Heavy static noise for barely audible effect
+                    noiseAmount = 0.4 + (distortionFactor - 0.8) * 0.6; // 0.4 to 0.6
+                } else {
+                    noiseAmount = distortionFactor * 0.4;
+                }
+                y += (random() * 2 - 1) * noiseAmount;
+                y = Math.max(-1, Math.min(1, y));
+                
+                // Additional harshness for heavy distortion - add more clipping
+                if (isHeavyDistortion) {
+                    y = Math.max(-1, Math.min(1, y * 1.2)); // Additional gain
+                    // Add more quantization noise
+                    const extraQuantization = Math.pow(2, Math.max(1, bitDepth - 1));
+                    y = Math.round(y * extraQuantization) / extraQuantization;
+                }
+            }
+            
+            curve[i] = y;
         }
+        
+        return curve;
     }
     
+    /**
+     * Load nature sounds from local assets folder
+     * Tries multiple file names and formats, then falls back to synthetic sounds
+     */
+    async loadNatureSounds() {
+        // Try each possible file path
+        for (const path of this.natureSoundPaths) {
+            try {
+                console.log(`Attempting to load nature sound from: ${path}`);
+                const response = await fetch(path);
+                
+                if (!response.ok) {
+                    // File doesn't exist, try next path
+                    continue;
+                }
+                
+                const arrayBuffer = await response.arrayBuffer();
+                
+                if (arrayBuffer.byteLength === 0) {
+                    // Empty file, try next
+                    continue;
+                }
+                
+                this.natureBuffer = await this.audioContext.decodeAudioData(arrayBuffer);
+                
+                console.log(`Successfully loaded nature sound from: ${path}`);
+                
+                // Start the nature loop with distortion
+                this.startNatureLoop();
+                
+                // Set initial distortion to maximum (static/distorted)
+                this.updateDistortion(100);
+                
+                return; // Success, exit function
+                
+            } catch (error) {
+                // If it's a decode error, the file exists but is invalid
+                if (error.name === 'EncodingError' || error.name === 'NotSupportedError') {
+                    console.warn(`File ${path} exists but could not be decoded:`, error);
+                    // Continue to try other files
+                } else if (error.message && error.message.includes('404')) {
+                    // File not found, try next
+                    continue;
+                } else {
+                    console.warn(`Failed to load from ${path}:`, error);
+                    // Continue to next path
+                }
+            }
+        }
+        
+        // If all paths failed, use synthetic fallback
+        console.warn('No nature sound file found in assets folder. Tried:', this.natureSoundPaths);
+        console.warn('Using synthetic nature sound fallback. To use a real file, add one of these to assets/:');
+        console.warn('  - nature-sound.mp3 (or .ogg, .wav)');
+        console.warn('  - nature.mp3 (or .ogg, .wav)');
+        this.createSyntheticNatureSound();
+    }
+    
+    /**
+     * Create synthetic nature sounds as fallback
+     */
     createSyntheticNatureSound() {
         if (!this.audioContext) return;
         
         // Create multiple oscillators for a more complex nature sound
-        // This is a placeholder - real nature sounds would be better
         const bufferSize = this.audioContext.sampleRate * 2; // 2 seconds
         const buffer = this.audioContext.createBuffer(1, bufferSize, this.audioContext.sampleRate);
         const data = buffer.getChannelData(0);
@@ -167,6 +335,9 @@ class AudioSystem {
         
         this.natureBuffer = buffer;
         this.startNatureLoop();
+        
+        // Set initial distortion to maximum
+        this.updateDistortion(100);
     }
     
     startNatureLoop() {
@@ -179,13 +350,29 @@ class AudioSystem {
         this.natureLoop = this.audioContext.createBufferSource();
         this.natureLoop.buffer = this.natureBuffer;
         this.natureLoop.loop = true;
-        this.natureLoop.connect(this.natureGain);
+        // Connect through distortion node instead of directly to natureGain
+        this.natureLoop.connect(this.distortionNode);
         this.natureLoop.start(0);
     }
     
     /**
+     * Update distortion amount (0-100, where 0 = clear, 100 = maximum static/distortion)
+     * @param {number} amount - Distortion amount (0-100)
+     */
+    updateDistortion(amount) {
+        if (!this.distortionNode) return;
+        
+        // Clamp amount to 0-100
+        amount = Math.max(0, Math.min(100, amount));
+        
+        // Update the distortion curve
+        this.distortionNode.curve = this.makeDistortionCurve(amount);
+    }
+    
+    /**
      * Update audio mix based on convergence error
-     * High error = more noise, low error = more nature sounds
+     * High error = more noise + distorted nature sound
+     * Low error = clear nature sound, less noise
      * @param {number} maxError - Maximum error across all equations
      */
     updateMix(maxError) {
@@ -211,29 +398,49 @@ class AudioSystem {
         // Don't update mix if muted
         if (this.isMuted) return;
         
-        // Map error to audio mix using linear mapping
-        // When error is high (>1.0), noise dominates
-        // When error is low (<0.1), nature sounds dominate
-        let noiseVolume, natureVolume;
+        // Non-linear distortion mapping using exponential curve
+        // Stays very distorted for most of the process, then clears quickly near solution
+        let noiseVolume, natureVolume, distortionAmount;
         
         if (maxError >= 1.0) {
+            // High error: maximum distortion, barely audible nature sound
             noiseVolume = 1.0;
-            natureVolume = 0.0;
+            distortionAmount = 100; // Maximum distortion (static)
+            natureVolume = 0.1; // Barely audible when heavily distorted (matches continuous curve)
         } else if (maxError <= 0.0001) {
+            // Converged: clear sound, full volume, continues playing
+            // This state will persist - updateMix() continues to be called but maintains
+            // these values, ensuring the clear nature sound keeps playing indefinitely
             noiseVolume = 0.0;
-            natureVolume = 1.0;
+            distortionAmount = 0; // No distortion (clear)
+            natureVolume = 1.0; // Full volume - natureLoop is set to loop=true
         } else {
-            // Linear interpolation
-            noiseVolume = maxError / 1.0;
-            natureVolume = 1.0 - noiseVolume;
+            // Non-linear exponential mapping for distortion
+            // Uses power curve: stays high for most errors, drops quickly near solution
+            const normalizedError = Math.min(maxError / 1.0, 1.0);
+            distortionAmount = 100 * Math.pow(normalizedError, 0.3); // Exponential decay
+            
+            // Noise volume: linear fade out as error decreases
+            noiseVolume = normalizedError;
+            
+            // Nature volume: continuously increases as distortion decreases
+            // Smooth curve from barely audible (0.1) at 100% distortion to full volume (1.0) at 0% distortion
+            // Uses power curve for smooth, natural-sounding increase
+            const distortionFactor = distortionAmount / 100; // 0 to 1
+            const clarityFactor = 1 - distortionFactor; // 1 to 0 (inverse of distortion)
+            // Power curve: starts slow, accelerates as clarity increases
+            natureVolume = 0.1 + Math.pow(clarityFactor, 0.8) * 0.9; // 0.1 to 1.0
         }
         
-        // Smooth crossfading (100ms ramp)
+        // Smooth crossfading (200ms ramp for smoother transitions)
         const now = this.audioContext.currentTime;
-        const rampTime = 0.1;
+        const rampTime = 0.2;
         
         this.noiseGain.gain.setTargetAtTime(noiseVolume, now, rampTime);
         this.natureGain.gain.setTargetAtTime(natureVolume, now, rampTime);
+        
+        // Update distortion: non-linear clearing as error decreases
+        this.updateDistortion(distortionAmount);
     }
     
     setVolume(value) {

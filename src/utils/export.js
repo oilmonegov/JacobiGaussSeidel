@@ -1,7 +1,7 @@
 /**
  * Export Module
  * 
- * Handles CSV export of performance data and PDF export of equation history
+ * Handles CSV export of performance data
  */
 
 /**
@@ -186,101 +186,4 @@ export function generateFilename() {
     return `performance-data-${year}-${month}-${day}-${hours}-${minutes}-${seconds}.csv`;
 }
 
-/**
- * Export equation history to PDF using browser print dialog
- * @param {Array} equationHistory - Array of iteration snapshots
- * @param {number[][]} A - Coefficient matrix
- * @param {number[]} b - Constant vector
- * @param {number} n - System size
- * @param {string} method - Method name ('jacobi' or 'gaussSeidel')
- * @returns {Promise<void>}
- */
-export async function exportEquationHistoryToPDF(equationHistory, A, b, n, method) {
-    // Validate inputs
-    if (!Array.isArray(equationHistory) || equationHistory.length === 0) {
-        throw new Error('Equation history is empty. Perform iterations to generate history.');
-    }
-    
-    if (!A || !b || n <= 0) {
-        throw new Error('Invalid system parameters.');
-    }
-    
-    // Get the modal element
-    const modal = document.getElementById('equationHistoryModal');
-    if (!modal) {
-        throw new Error('Equation history modal not found.');
-    }
-    
-    // Ensure modal is visible (it should be if user clicked export)
-    const wasHidden = modal.classList.contains('hidden');
-    if (wasHidden) {
-        modal.classList.remove('hidden');
-    }
-    
-    // Wait a bit for any rendering to complete
-    await new Promise(resolve => setTimeout(resolve, 100));
-    
-    // Add print styles to the document
-    const printStyle = document.createElement('style');
-    printStyle.id = 'equation-export-print-styles';
-    printStyle.textContent = `
-        @media print {
-            body * {
-                visibility: hidden;
-            }
-            #equationHistoryModal,
-            #equationHistoryModal * {
-                visibility: visible;
-            }
-            #equationHistoryModal {
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 100%;
-                height: auto;
-                background: white;
-                padding: 0;
-                margin: 0;
-                box-shadow: none;
-                border: none;
-            }
-            .modal-overlay {
-                position: static;
-                background: white;
-            }
-            .modal-close,
-            .modal-actions,
-            .modal-actions * {
-                display: none !important;
-            }
-            .modal-header h2 {
-                margin-top: 0;
-            }
-            .equation-visualizer-content {
-                max-height: none;
-                overflow: visible;
-            }
-            .iteration-section {
-                page-break-inside: avoid;
-                margin-bottom: 20px;
-            }
-        }
-    `;
-    document.head.appendChild(printStyle);
-    
-    // Trigger print dialog
-    window.print();
-    
-    // Clean up print styles after a delay (print dialog is async)
-    setTimeout(() => {
-        const styleEl = document.getElementById('equation-export-print-styles');
-        if (styleEl) {
-            document.head.removeChild(styleEl);
-        }
-        // Restore modal hidden state if it was hidden
-        if (wasHidden) {
-            modal.classList.add('hidden');
-        }
-    }, 1000);
-}
 
