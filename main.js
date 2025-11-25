@@ -915,6 +915,9 @@ function performIteration() {
         // Complete performance measurement
         completeMeasurement(state.method, state.iteration, state);
         
+        // Update displays to show updated history statistics
+        updateDisplays();
+        
         // Show performance comparison if both methods have converged
         const jacobiRuns = state.performanceHistory.jacobi.runs || [];
         const gaussSeidelRuns = state.performanceHistory.gaussSeidel.runs || [];
