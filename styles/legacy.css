@@ -3684,4 +3684,74 @@ h1, h2, h3 {
     #solutionModal .katex-display {
         color: black !important;
     }
+    
+    /* Print styles for equation history modal */
+    #equationHistoryModal,
+    #equationHistoryModal * {
+        visibility: visible;
+    }
+    
+    #equationHistoryModal {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: auto;
+        background: white;
+        padding: 0;
+        margin: 0;
+        box-shadow: none;
+        border: none;
+        z-index: 9999;
+    }
+    
+    #equationHistoryModal .modal-overlay {
+        position: static;
+        background: white;
+        display: block;
+    }
+    
+    #equationHistoryModal .modal-content {
+        position: static;
+        max-width: 100%;
+        width: 100%;
+        max-height: none;
+        height: auto;
+        overflow: visible;
+        padding: 20px;
+        margin: 0;
+        box-shadow: none;
+        border: none;
+        background: white;
+        color: black;
+    }
+    
+    #equationHistoryModal .modal-close,
+    #equationHistoryModal .modal-actions,
+    #equationHistoryModal .modal-actions * {
+        display: none !important;
+    }
+    
+    #equationHistoryModal .modal-header h2 {
+        color: black !important;
+        page-break-after: avoid;
+        margin-top: 0;
+    }
+    
+    #equationHistoryModal .equation-visualizer-content {
+        max-height: none;
+        overflow: visible;
+        background: white;
+        padding: 20px;
+    }
+    
+    #equationHistoryModal .iteration-section {
+        page-break-inside: avoid;
+        margin-bottom: 20px;
+    }
+    
+    #equationHistoryModal .katex,
+    #equationHistoryModal .katex-display {
+        color: black !important;
+    }
 }

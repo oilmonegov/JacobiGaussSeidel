@@ -106,6 +106,7 @@ const elements = {
     equationHistoryBtn: document.getElementById('equationHistoryBtn'),
     equationHistoryModal: document.getElementById('equationHistoryModal'),
     closeEquationHistoryModal: document.getElementById('closeEquationHistoryModal'),
+    printEquationHistoryBtn: document.getElementById('printEquationHistoryBtn'),
     closeEquationHistoryBtn: document.getElementById('closeEquationHistoryBtn'),
     solutionBtn: document.getElementById('solutionBtn'),
     solutionModal: document.getElementById('solutionModal'),
@@ -1730,6 +1731,14 @@ function setupEventListeners() {
     }
     if (elements.closeEquationHistoryBtn) {
         elements.closeEquationHistoryBtn.addEventListener('click', hideEquationHistoryModal);
+    }
+    if (elements.printEquationHistoryBtn) {
+        elements.printEquationHistoryBtn.addEventListener('click', () => {
+            window.print();
+            if (window.audioSystem) {
+                window.audioSystem.playButtonClick();
+            }
+        });
     }
     if (elements.equationHistoryModal) {
         elements.equationHistoryModal.addEventListener('click', (e) => {
