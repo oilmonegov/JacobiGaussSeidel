@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jacobi Iteration Equalizer</title>
     <link rel="stylesheet" href="styles/legacy.css">
-    <!-- TODO: Switch to modular CSS when fully split: <link rel="stylesheet" href="styles/main.css"> -->
     <!-- KaTeX for math formatting -->
     <link rel="stylesheet" href="assets/katex/katex.min.css">
     <script defer src="assets/katex/katex.min.js"></script>
@@ -592,9 +591,10 @@
         </div>
     </div>
 
-    <script src="src/audio/audioSystem.js"></script>
+    <!-- Bundled JavaScript Files -->
+    <script src="dist/audioSystem.bundle.js"></script>
     <!-- State Management -->
-    <script src="stateManager.bundle.js"></script>
+    <script src="dist/stateManager.bundle.js"></script>
     <!-- Configuration Modal -->
     <div class="modal-overlay hidden" id="configModal">
         <div class="modal-content config-modal-content">
@@ -768,7 +768,8 @@
         </div>
     </div>
 
-    <script type="module" src="main.js"></script>
+    <!-- Main Application Bundle -->
+    <script src="dist/main.bundle.js"></script>
 </body>
 </html>
 

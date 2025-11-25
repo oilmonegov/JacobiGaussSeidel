@@ -19,14 +19,14 @@ describe('Performance: Memory Usage', () => {
         global.performance.memory = undefined;
     });
 
-    it('should return memory in MB when available', () => {
+    it('should return memory in bytes when available', () => {
         global.performance.memory = {
-            usedJSHeapSize: 10 * 1024 * 1024 // 10 MB
+            usedJSHeapSize: 10 * 1024 * 1024 // 10 MB in bytes
         };
         
         const memory = getMemoryUsage();
         
-        expect(memory).toBeCloseTo(10, 2);
+        expect(memory).toBe(10 * 1024 * 1024);
     });
 
     it('should return null when memory API unavailable', () => {
@@ -44,9 +44,8 @@ describe('Performance: Memory Usage', () => {
         
         const memory = getMemoryUsage();
         
-        // When usedJSHeapSize is 0, it's falsy, so the function returns null
-        // This is the actual behavior of the function
-        expect(memory).toBeNull();
+        // Zero is a valid memory value (0 bytes), not an unavailable API
+        expect(memory).toBe(0);
     });
 });
 
@@ -62,7 +61,7 @@ describe('Performance: Measurement Lifecycle', () => {
         global.performance = global.performance || {};
         global.performance.now = vi.fn(() => 1000);
         global.performance.memory = {
-            usedJSHeapSize: 5 * 1024 * 1024 // 5 MB
+            usedJSHeapSize: 5 * 1024 * 1024 // 5 MB in bytes
         };
     });
 
@@ -210,7 +209,7 @@ describe('Performance: Statistics', () => {
             const runs = [{
                 iterations: 10,
                 timeToConverge: 0.5,
-                memoryUsed: 5.0,
+                memoryUsed: 5242880, // 5 MB in bytes
                 avgTimePerIteration: 50.0
             }];
             
@@ -229,19 +228,19 @@ describe('Performance: Statistics', () => {
                 {
                     iterations: 10,
                     timeToConverge: 0.1,
-                    memoryUsed: 5.0,
+                    memoryUsed: 5242880, // 5 MB in bytes
                     avgTimePerIteration: 10.0
                 },
                 {
                     iterations: 15,
                     timeToConverge: 0.2,
-                    memoryUsed: 6.0,
+                    memoryUsed: 6291456, // 6 MB in bytes
                     avgTimePerIteration: 13.3
                 },
                 {
                     iterations: 8,
                     timeToConverge: 0.05,
-                    memoryUsed: 4.0,
+                    memoryUsed: 4194304, // 4 MB in bytes
                     avgTimePerIteration: 6.25
                 }
             ];
@@ -251,19 +250,19 @@ describe('Performance: Statistics', () => {
             // Best should be minimum
             expect(stats.best.time).toBe(0.05);
             expect(stats.best.iterations).toBe(8);
-            expect(stats.best.memory).toBe(4.0);
+            expect(stats.best.memory).toBe(4194304); // 4 MB
             expect(stats.best.avgTimePerIter).toBe(6.25);
             
             // Worst should be maximum
             expect(stats.worst.time).toBe(0.2);
             expect(stats.worst.iterations).toBe(15);
-            expect(stats.worst.memory).toBe(6.0);
+            expect(stats.worst.memory).toBe(6291456); // 6 MB
             expect(stats.worst.avgTimePerIter).toBe(13.3);
             
             // Average
             expect(stats.average.time).toBeCloseTo((0.1 + 0.2 + 0.05) / 3, 3);
             expect(stats.average.iterations).toBeCloseTo((10 + 15 + 8) / 3, 1);
-            expect(stats.average.memory).toBeCloseTo((5.0 + 6.0 + 4.0) / 3, 2);
+            expect(stats.average.memory).toBeCloseTo((5242880 + 6291456 + 4194304) / 3, 0);
         });
 
         it('should handle null memory values', () => {
@@ -277,7 +276,7 @@ describe('Performance: Statistics', () => {
                 {
                     iterations: 15,
                     timeToConverge: 0.2,
-                    memoryUsed: 5.0,
+                    memoryUsed: 5242880, // 5 MB in bytes
                     avgTimePerIteration: 13.3
                 }
             ];
@@ -285,9 +284,9 @@ describe('Performance: Statistics', () => {
             const stats = calculateStats(runs);
             
             // Should only use non-null values for memory stats
-            expect(stats.best.memory).toBe(5.0);
-            expect(stats.worst.memory).toBe(5.0);
-            expect(stats.average.memory).toBe(5.0);
+            expect(stats.best.memory).toBe(5242880); // 5 MB
+            expect(stats.worst.memory).toBe(5242880); // 5 MB
+            expect(stats.average.memory).toBe(5242880); // 5 MB
         });
 
         it('should handle all null memory values', () => {
@@ -318,13 +317,13 @@ describe('Performance: Statistics', () => {
                 {
                     iterations: 10,
                     timeToConverge: Infinity,
-                    memoryUsed: 5.0,
+                    memoryUsed: 5242880, // 5 MB in bytes
                     avgTimePerIteration: 10.0
                 },
                 {
                     iterations: 15,
                     timeToConverge: 0.2,
-                    memoryUsed: 6.0,
+                    memoryUsed: 6291456, // 6 MB in bytes
                     avgTimePerIteration: 13.3
                 }
             ];

@@ -33,7 +33,7 @@ describe('Export: CSV Export', () => {
             
             const csv = exportPerformanceToCSV(history);
             
-            expect(csv).toContain('Method,Run,Iterations,Time (s),Memory (MB),Avg Time/Iter (ms),Timestamp');
+            expect(csv).toContain('Method,Run,Iterations,Time (s),Memory (bytes),Avg Time/Iter (ms),Timestamp');
             expect(csv.split('\n').length).toBe(1); // Only header
         });
 
@@ -59,7 +59,7 @@ describe('Export: CSV Export', () => {
             expect(lines[1]).toContain('1');
             expect(lines[1]).toContain('10');
             expect(lines[1]).toContain('0.123');
-            expect(lines[1]).toContain('5.67');
+            expect(lines[1]).toContain('5945426');
         });
 
         it('should export multiple runs with statistics', () => {
@@ -69,14 +69,14 @@ describe('Export: CSV Export', () => {
                         {
                             iterations: 10,
                             timeToConverge: 0.1,
-                            memoryUsed: 5.0,
+                            memoryUsed: 5242880, // 5 MB in bytes
                             avgTimePerIteration: 10.0,
                             timestamp: '2024-01-01T12:00:00.000Z'
                         },
                         {
                             iterations: 15,
                             timeToConverge: 0.2,
-                            memoryUsed: 6.0,
+                            memoryUsed: 6291456, // 6 MB in bytes
                             avgTimePerIteration: 13.3,
                             timestamp: '2024-01-01T12:01:00.000Z'
                         }
@@ -123,7 +123,7 @@ describe('Export: CSV Export', () => {
                     runs: [{
                         iterations: 10,
                         timeToConverge: 0.1,
-                        memoryUsed: 5.0,
+                        memoryUsed: 5242880, // 5 MB in bytes
                         avgTimePerIteration: 10.0,
                         timestamp: '2024-01-01T12:00:00.000Z'
                     }]
@@ -132,7 +132,7 @@ describe('Export: CSV Export', () => {
                     runs: [{
                         iterations: 8,
                         timeToConverge: 0.08,
-                        memoryUsed: 4.5,
+                        memoryUsed: 4718592, // 4.5 MB in bytes
                         avgTimePerIteration: 10.0,
                         timestamp: '2024-01-01T12:00:00.000Z'
                     }]

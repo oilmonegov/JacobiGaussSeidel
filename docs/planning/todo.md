@@ -1,3 +1,6 @@
+> **⚠️ OBSOLETE DOCUMENT**  
+> This document is obsolete. It is a historical record of completed work (all phases are complete). It is kept for historical reference only.
+
 # Todo List – Jacobi Iteration Equalizer Simulator 🎛️
 
 ## Phase 1: Project Setup & Foundation

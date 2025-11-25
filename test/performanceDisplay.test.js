@@ -102,7 +102,7 @@ describe('Performance Display', () => {
         it('should display current metrics for Jacobi', () => {
             mockState.performanceHistory.jacobi.currentRun = {
                 elapsedTime: 0.5,
-                memoryUsed: 5.0,
+                memoryUsed: 5242880, // 5 MB in bytes
                 avgTimePerIteration: 50.0
             };
             
@@ -110,14 +110,14 @@ describe('Performance Display', () => {
             
             const jacobiCurrent = document.getElementById('jacobiCurrent');
             expect(jacobiCurrent.innerHTML).toContain('0.500 s');
-            expect(jacobiCurrent.innerHTML).toContain('5.00 MB');
+            expect(jacobiCurrent.innerHTML).toContain('5,242,880 bytes');
             expect(jacobiCurrent.innerHTML).toContain('50.00 ms/iter');
         });
 
         it('should display current metrics for Gauss-Seidel', () => {
             mockState.performanceHistory.gaussSeidel.currentRun = {
                 elapsedTime: 0.3,
-                memoryUsed: 4.5,
+                memoryUsed: 4718592, // 4.5 MB in bytes
                 avgTimePerIteration: 30.0
             };
             
@@ -125,7 +125,7 @@ describe('Performance Display', () => {
             
             const gaussSeidelCurrent = document.getElementById('gaussSeidelCurrent');
             expect(gaussSeidelCurrent.innerHTML).toContain('0.300 s');
-            expect(gaussSeidelCurrent.innerHTML).toContain('4.50 MB');
+            expect(gaussSeidelCurrent.innerHTML).toContain('4,718,592 bytes');
             expect(gaussSeidelCurrent.innerHTML).toContain('30.00 ms/iter');
         });
 
@@ -146,7 +146,7 @@ describe('Performance Display', () => {
             mockState.performanceHistory.jacobi.runs = [{
                 iterations: 10,
                 timeToConverge: 0.5,
-                memoryUsed: 5.0,
+                memoryUsed: 5242880, // 5 MB in bytes
                 avgTimePerIteration: 50.0,
                 timestamp: '2024-01-01T12:00:00.000Z'
             }];
@@ -178,7 +178,7 @@ describe('Performance Display', () => {
             mockState.performanceHistory.jacobi.runs = [{
                 iterations: 10,
                 timeToConverge: 0.5,
-                memoryUsed: 5.0,
+                memoryUsed: 5242880, // 5 MB in bytes
                 avgTimePerIteration: 50.0,
                 timestamp: '2024-01-01T12:00:00.000Z'
             }];
@@ -190,12 +190,12 @@ describe('Performance Display', () => {
         it('should highlight winner for time metric', () => {
             mockState.performanceHistory.jacobi.currentRun = {
                 elapsedTime: 0.3,
-                memoryUsed: 5.0,
+                memoryUsed: 5242880, // 5 MB in bytes
                 avgTimePerIteration: 30.0
             };
             mockState.performanceHistory.gaussSeidel.currentRun = {
                 elapsedTime: 0.5,
-                memoryUsed: 6.0,
+                memoryUsed: 6291456, // 6 MB in bytes
                 avgTimePerIteration: 50.0
             };
             
@@ -213,12 +213,12 @@ describe('Performance Display', () => {
         it('should highlight winner for memory metric', () => {
             mockState.performanceHistory.jacobi.currentRun = {
                 elapsedTime: 0.5,
-                memoryUsed: 4.0,
+                memoryUsed: 4194304, // 4 MB in bytes
                 avgTimePerIteration: 50.0
             };
             mockState.performanceHistory.gaussSeidel.currentRun = {
                 elapsedTime: 0.5,
-                memoryUsed: 6.0,
+                memoryUsed: 6291456, // 6 MB in bytes
                 avgTimePerIteration: 50.0
             };
             
@@ -232,12 +232,12 @@ describe('Performance Display', () => {
         it('should highlight winner for CPU metric', () => {
             mockState.performanceHistory.jacobi.currentRun = {
                 elapsedTime: 0.5,
-                memoryUsed: 5.0,
+                memoryUsed: 5242880, // 5 MB in bytes
                 avgTimePerIteration: 30.0
             };
             mockState.performanceHistory.gaussSeidel.currentRun = {
                 elapsedTime: 0.5,
-                memoryUsed: 5.0,
+                memoryUsed: 5242880, // 5 MB in bytes
                 avgTimePerIteration: 50.0
             };
             
@@ -261,14 +261,14 @@ describe('Performance Display', () => {
                 {
                     iterations: 10,
                     timeToConverge: 0.1,
-                    memoryUsed: 5.0,
+                    memoryUsed: 5242880, // 5 MB in bytes
                     avgTimePerIteration: 10.0,
                     timestamp: '2024-01-01T12:00:00.000Z'
                 },
                 {
                     iterations: 15,
                     timeToConverge: 0.2,
-                    memoryUsed: 6.0,
+                    memoryUsed: 6291456, // 6 MB in bytes
                     avgTimePerIteration: 13.3,
                     timestamp: '2024-01-01T12:01:00.000Z'
                 }
@@ -288,14 +288,14 @@ describe('Performance Display', () => {
             mockState.performanceHistory.jacobi.runs = [{
                 iterations: 10,
                 timeToConverge: 0.5,
-                memoryUsed: 5.0,
+                memoryUsed: 5242880, // 5 MB in bytes
                 avgTimePerIteration: 50.0,
                 timestamp: '2024-01-01T12:00:00.000Z'
             }];
             mockState.performanceHistory.gaussSeidel.runs = [{
                 iterations: 8,
                 timeToConverge: 0.4,
-                memoryUsed: 4.5,
+                memoryUsed: 4718592, // 4.5 MB in bytes
                 avgTimePerIteration: 50.0,
                 timestamp: '2024-01-01T12:00:00.000Z'
             }];

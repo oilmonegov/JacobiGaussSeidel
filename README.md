@@ -262,7 +262,7 @@ Requires ES6 module support and Web Audio API.
 Additional documentation is available in the `docs/` directory:
 
 - `docs/prd.md`: Product Requirements Document
-- `docs/PROJECT_STRUCTURE.md`: Detailed project structure
+- `docs/PROJECT_STRUCTURE.md`: Project structure (obsolete - historical reference only)
 - `docs/design/`: Design and style guides
 - `docs/features/`: Feature documentation
 

@@ -285,7 +285,7 @@ The metrics should update in real-time during iteration and provide clear visual
 ## Related Documents
 
 - `prd.md` - Product Requirements Document
-- `feature-todo.md` - Main feature todo list
+- `feature-todo.md` - Main feature todo list (archived - feature completed)
 - `test-plan.md` - Testing documentation
 - `STATE_MANAGEMENT.md` - State management patterns
 

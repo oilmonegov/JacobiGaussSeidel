@@ -1,3 +1,6 @@
+> **⚠️ OBSOLETE DOCUMENT**  
+> This document is obsolete. It is a test execution checklist template that was never executed. It is kept for historical reference only.
+
 # Test Execution Checklist - Jacobi Iteration Equalizer Simulator
 
 **Version:** 1.0  

@@ -1,9 +1,12 @@
+> **⚠️ ARCHIVED DOCUMENT**  
+> This document is archived as the feature has been completed. It is kept for historical reference only.
+
 # Feature Todo: Audio Distortion Algorithm
 
 **Feature Document:** `feature-audio-distortion.md`  
 **Version:** 1.0  
 **Date:** 2025-01-27  
-**Status:** Completed
+**Status:** Completed (Archived)
 
 ---
 

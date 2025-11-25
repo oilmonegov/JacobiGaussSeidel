@@ -13,15 +13,15 @@
  */
 
 // Import core modules
-import { calculateErrors, getMaxError, getConvergenceState, clamp } from './src/core/math.js';
-import { computeNextJacobi } from './src/core/jacobi.js';
-import { computeNextGaussSeidel } from './src/core/gaussSeidel.js';
-import { getDefaultSystem } from './src/core/system.js';
-import { renderLaTeXWithKaTeX } from './src/utils/formatting.js';
-import { initEquationVisualizer, updateEquationVisualizer, addIterationSnapshot, clearEquationHistory } from './src/ui/equationVisualizer.js';
-import { startMeasurement, updateMeasurement, completeMeasurement, resetCurrentRun } from './src/utils/performance.js';
-import { updatePerformanceDisplay } from './src/ui/performanceDisplay.js';
-import { exportPerformanceToCSV, downloadCSV, generateFilename } from './src/utils/export.js';
+import { calculateErrors, getMaxError, getConvergenceState, clamp } from './core/math.js';
+import { computeNextJacobi } from './core/jacobi.js';
+import { computeNextGaussSeidel } from './core/gaussSeidel.js';
+import { getDefaultSystem } from './core/system.js';
+import { renderLaTeXWithKaTeX } from './utils/formatting.js';
+import { initEquationVisualizer, updateEquationVisualizer, addIterationSnapshot, clearEquationHistory } from './ui/equationVisualizer.js';
+import { startMeasurement, updateMeasurement, completeMeasurement, resetCurrentRun } from './utils/performance.js';
+import { updatePerformanceDisplay } from './ui/performanceDisplay.js';
+import { exportPerformanceToCSV, downloadCSV, generateFilename } from './utils/export.js';
 
 // State management
 const state = {

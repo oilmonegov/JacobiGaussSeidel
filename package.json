@@ -2,7 +2,7 @@
   "name": "linearequation",
   "version": "1.0.0",
   "description": "Jacobi Iteration Equalizer - Interactive linear equation solver",
-  "main": "main.js",
+  "main": "src/main.js",
   "type": "module",
   "scripts": {
     "test": "vitest",
@@ -11,8 +11,11 @@
     "test:coverage": "vitest run --coverage",
     "start": "npx http-server . -p 8080 -o",
     "dev": "npx http-server . -p 8080 -o",
-    "build:state": "npx esbuild src/state/stateManager.js --bundle --format=iife --global-name=StateManager --outfile=stateManager.bundle.js",
-    "build": "npm run build:state"
+    "build:state": "npx esbuild src/state/stateManager.js --bundle --format=iife --global-name=StateManager --outfile=dist/stateManager.bundle.js",
+    "build:audio": "npx esbuild src/audio/audioSystem.js --bundle --format=iife --outfile=dist/audioSystem.bundle.js",
+    "build:main": "npx esbuild src/main.js --bundle --format=iife --outfile=dist/main.bundle.js",
+    "build:all": "npm run build:state && npm run build:audio && npm run build:main",
+    "build": "npm run build:all"
   },
   "keywords": [],
   "author": "",

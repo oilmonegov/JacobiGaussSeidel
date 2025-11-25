@@ -273,7 +273,7 @@ The PDF should be well-formatted, print-friendly, and preserve all mathematical 
 ## Related Documents
 
 - `prd.md` - Product Requirements Document
-- `feature-todo.md` - Main feature todo list
+- `feature-todo.md` - Main feature todo list (archived - feature completed)
 - `feature-equation-visualizer.md` - Equation visualizer feature documentation
 - `test-plan.md` - Testing documentation
 

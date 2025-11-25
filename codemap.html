@@ -213,9 +213,9 @@
                 { id: "index.html", type: "html", group: 1, size: 25, description: "Main application entry point" },
                 
                 // Core JavaScript
-                { id: "main.js", type: "js", group: 2, size: 30, description: "Main application logic (2951 lines)" },
+                { id: "src/main.js", type: "js", group: 2, size: 30, description: "Main application logic (2951 lines)" },
                 { id: "stateManager.js", type: "js", group: 2, size: 22, description: "State management system" },
-                { id: "stateManager.bundle.js", type: "js", group: 2, size: 20, description: "Bundled state manager" },
+                { id: "dist/stateManager.bundle.js", type: "js", group: 2, size: 20, description: "Bundled state manager" },
                 { id: "audio.js", type: "js", group: 2, size: 18, description: "Audio system for feedback" },
                 
                 // CSS
@@ -244,21 +244,21 @@
             ],
             links: [
                 // HTML dependencies
-                { source: "index.html", target: "main.js", type: "script" },
+                { source: "index.html", target: "src/main.js", type: "script" },
                 { source: "index.html", target: "styles.css", type: "stylesheet" },
-                { source: "index.html", target: "stateManager.bundle.js", type: "script" },
+                { source: "index.html", target: "dist/stateManager.bundle.js", type: "script" },
                 { source: "index.html", target: "audio.js", type: "script" },
                 { source: "index.html", target: "katex", type: "library" },
                 
                 // JavaScript dependencies
-                { source: "main.js", target: "stateManager.js", type: "import" },
-                { source: "stateManager.bundle.js", target: "stateManager.js", type: "bundle" },
-                { source: "main.js", target: "audio.js", type: "uses" },
+                { source: "src/main.js", target: "stateManager.js", type: "import" },
+                { source: "dist/stateManager.bundle.js", target: "stateManager.js", type: "bundle" },
+                { source: "src/main.js", target: "audio.js", type: "uses" },
                 
                 // Test dependencies
-                { source: "math.test.js", target: "main.js", type: "tests" },
+                { source: "math.test.js", target: "src/main.js", type: "tests" },
                 { source: "stateManager.test.js", target: "stateManager.js", type: "tests" },
-                { source: "utils.test.js", target: "main.js", type: "tests" },
+                { source: "utils.test.js", target: "src/main.js", type: "tests" },
                 { source: "math.test.js", target: "setup.js", type: "uses" },
                 { source: "stateManager.test.js", target: "setup.js", type: "uses" },
                 { source: "utils.test.js", target: "setup.js", type: "uses" },

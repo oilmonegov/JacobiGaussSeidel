@@ -9,7 +9,7 @@
  * @returns {number|null} Memory in MB or null if API unavailable
  */
 export function getMemoryUsage() {
-    if (performance.memory && performance.memory.usedJSHeapSize) {
+    if (performance.memory && typeof performance.memory.usedJSHeapSize === 'number') {
         return performance.memory.usedJSHeapSize / 1024 / 1024;
     }
     return null;
@@ -164,6 +164,28 @@ export function resetCurrentRun(method, state) {
 }
 
 /**
+ * Migrate bytes to MB for historical data
+ * Detects if a memory value is in bytes format (large number >= 1MB) and converts to MB
+ * @param {number|null} memoryValue - Memory value to potentially migrate
+ * @returns {number|null} Memory value in MB
+ */
+function migrateBytesToMB(memoryValue) {
+    if (memoryValue === null || memoryValue === undefined || !isFinite(memoryValue)) {
+        return memoryValue;
+    }
+    
+    // If memory value is greater than or equal to 1MB (1,048,576 bytes), it's likely in bytes format
+    // Real memory usage in MB is typically in the range of 1-1000 MB, so values >= 1MB are likely bytes
+    const ONE_MB_IN_BYTES = 1024 * 1024;
+    if (memoryValue >= ONE_MB_IN_BYTES) {
+        // Convert from bytes to MB
+        return memoryValue / ONE_MB_IN_BYTES;
+    }
+    
+    return memoryValue;
+}
+
+/**
  * Calculate statistics from run history
  * @param {Array} runs - Array of completed runs
  * @returns {Object|null} Statistics object or null if no runs
@@ -175,22 +197,23 @@ export function calculateStats(runs) {
     
     if (runs.length === 1) {
         const run = runs[0];
+        const migratedMemory = migrateBytesToMB(run.memoryUsed);
         return {
             best: {
                 time: run.timeToConverge,
-                memory: run.memoryUsed,
+                memory: migratedMemory,
                 iterations: run.iterations,
                 avgTimePerIter: run.avgTimePerIteration
             },
             worst: {
                 time: run.timeToConverge,
-                memory: run.memoryUsed,
+                memory: migratedMemory,
                 iterations: run.iterations,
                 avgTimePerIter: run.avgTimePerIteration
             },
             average: {
                 time: run.timeToConverge,
-                memory: run.memoryUsed,
+                memory: migratedMemory,
                 iterations: run.iterations,
                 avgTimePerIter: run.avgTimePerIteration
             }
@@ -219,11 +242,12 @@ export function calculateStats(runs) {
         if (run.timeToConverge > worstTime) worstTime = run.timeToConverge;
         sumTime += run.timeToConverge;
         
-        // Memory (only if available)
+        // Memory (only if available) - migrate bytes to MB
         if (run.memoryUsed !== null) {
-            if (run.memoryUsed < bestMemory) bestMemory = run.memoryUsed;
-            if (run.memoryUsed > worstMemory) worstMemory = run.memoryUsed;
-            sumMemory += run.memoryUsed;
+            const migratedMemory = migrateBytesToMB(run.memoryUsed);
+            if (migratedMemory < bestMemory) bestMemory = migratedMemory;
+            if (migratedMemory > worstMemory) worstMemory = migratedMemory;
+            sumMemory += migratedMemory;
             countMemory++;
         }
         
