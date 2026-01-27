@@ -23,6 +23,9 @@ import { startMeasurement, updateMeasurement, completeMeasurement, resetCurrentR
 import { updatePerformanceDisplay } from './ui/performanceDisplay.js';
 import { exportPerformanceToCSV, downloadCSV, generateFilename } from './utils/export.js';
 
+// Convergence threshold — single source of truth
+const CONVERGENCE_THRESHOLD = 0.0001;
+
 // State management
 const state = {
     // Dynamic System State
@@ -154,9 +157,7 @@ const elements = {
     visibilityBtn: null, // Will be set in init
     header: document.querySelector('.header'),
     equalizerBands: document.querySelector('.equalizer-bands'),
-    signalClarityDisplay: document.getElementById('signalClarityDisplay'),
     radioPanel: document.querySelector('.radio-panel'),
-    knobsContainer: document.querySelector('.knobs-container'),
     volumeControl: document.querySelector('.radio-volume-control'),
     tuningDial: document.getElementById('tuningDial'),
     controls: document.querySelector('.controls')
@@ -459,7 +460,7 @@ function updateDisplays() {
     }
     
     // Update signal clarity display border
-    if (maxError < 0.0001) {
+    if (maxError < CONVERGENCE_THRESHOLD) {
         elements.signalClarityDisplay.classList.add('balanced');
         // Show solution button when balanced
         if (elements.solutionBtn) {
@@ -490,15 +491,15 @@ function updateTuningDial(maxError) {
     const dialPointer = document.querySelector('.dial-pointer');
     if (!dialPointer) return;
     
-    // Map error to angle: maxError 1.0+ = -90deg (Static at bottom), maxError 0.0001 = 90deg (Clear at top)
+    // Map error to angle: maxError 1.0+ = -90deg (Static at bottom), threshold = 90deg (Clear at top)
     let angle;
     if (maxError >= 1.0) {
         angle = -90; // Static at bottom
-    } else if (maxError <= 0.0001) {
+    } else if (maxError <= CONVERGENCE_THRESHOLD) {
         angle = 90; // Clear Signal at top
     } else {
         // Linear interpolation between -90 (bottom/Static) and 90 (top/Clear)
-        const normalized = (1.0 - maxError) / (1.0 - 0.0001);
+        const normalized = (1.0 - maxError) / (1.0 - CONVERGENCE_THRESHOLD);
         angle = -90 + (normalized * 180);
     }
     
@@ -516,9 +517,18 @@ function updateBandRange(errors) {
     });
     
     if (lhsValues.length === 0) return;
-    
+
     const minLHS = Math.min(...lhsValues);
     const maxLHS = Math.max(...lhsValues);
+
+    // Guard against degenerate case where all LHS values are identical
+    if (minLHS === maxLHS) {
+        const fallback = Math.max(12, Math.abs(minLHS) + 2);
+        state.bandRangeMin = -fallback;
+        state.bandRangeMax = fallback;
+        state.bandRangeCenter = 0;
+        return;
+    }
     
     // Calculate a symmetric range that accommodates all values with some padding
     // Use the maximum absolute value to ensure symmetric range
@@ -911,7 +921,7 @@ function performIteration() {
     const errors = calculateErrors(state.x, state.A, state.b);
     const maxError = getMaxError(errors);
     
-    if (maxError < 0.0001) {
+    if (maxError < CONVERGENCE_THRESHOLD) {
         // Complete performance measurement
         completeMeasurement(state.method, state.iteration, state);
         
@@ -1195,7 +1205,7 @@ function updateKnobDrag(event) {
             
             // Update signal clarity display border
             if (elements.signalClarityDisplay) {
-                if (maxError < 0.0001) {
+                if (maxError < CONVERGENCE_THRESHOLD) {
                     elements.signalClarityDisplay.classList.add('balanced');
                     if (elements.solutionBtn) {
                         elements.solutionBtn.style.display = 'block';
@@ -1337,7 +1347,7 @@ function updateVolumeFromPosition(clientX) {
         // Unmute if volume is increased from 0, or mute if set to 0
         if (state.volume > 0 && window.audioSystem.isMuted) {
             window.audioSystem.toggleMute(); // This will unmute
-        } else if (state.volume === 0 && !window.audioSystem.isMuted) {
+        } else if (state.volume < 0.5 && !window.audioSystem.isMuted) {
             window.audioSystem.toggleMute(); // This will mute
         }
         
@@ -1673,12 +1683,7 @@ function setupEventListeners() {
             const oldMethod = state.method;
             const newMethod = e.target.value;
             
-            // Complete current run for previous method if in progress
-            if (state.performanceHistory[oldMethod] && state.performanceHistory[oldMethod].currentRun) {
-                completeMeasurement(oldMethod, state.iteration, state);
-            }
-            
-            // Reset current run for previous method
+            // Discard incomplete run for previous method (don't record non-converged data)
             resetCurrentRun(oldMethod, state);
             
             state.method = newMethod;
@@ -2191,7 +2196,7 @@ function parseEquationText(text) {
         
         // Pattern: ([+-]?)(number)?x(index)
         // We iterate through the string looking for matches
-        const regex = /([+-]?)(\d*\.?\d*)x(\d+)/g;
+        const regex = /([+-]?)(\d*\.?\d*(?:e[+-]?\d+)?)x(\d+)/gi;
         let match;
         
         while ((match = regex.exec(lhs)) !== null) {
@@ -2554,15 +2559,10 @@ function applySystemConfiguration() {
     state.visibleKnobs = visibleKnobs;
     state.visibleBands = visibleBands;
     
-    // Resize x array
-    const newX = new Array(state.n).fill(0);
-    // Preserve existing x values
-    for(let i=0; i<Math.min(state.x.length, state.n); i++) {
-        newX[i] = state.x[i];
-    }
-    state.x = newX;
-    
-    // Store current x values as the new initial guess for reset functionality
+    // Resize x array — reset all values to 0 for a clean start with new system
+    state.x = new Array(state.n).fill(0);
+
+    // Store as the new initial guess for reset functionality
     state.initialGuess = [...state.x];
     
     // Reset iteration
